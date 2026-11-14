@@ -295,7 +295,7 @@ export default function HardwareView() {
               style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
             >
               <tr>
-                <td className="py-2 px-3 font-bold">STM32F401 MCU</td>
+                <td className="py-2 px-3 font-bold">STM32H743ZI MCU</td>
                 <td className="py-2 px-3">Sensor Telemetry &amp; Actuation</td>
                 <td className="py-2 px-3 font-bold">3.3V DC</td>
                 <td className="py-2 px-3" style={{ color: 'var(--ok)' }}>Direct (Native 3.3V)</td>
@@ -306,7 +306,7 @@ export default function HardwareView() {
                 <td className="py-2 px-3 font-bold">Artix-7 FPGA</td>
                 <td className="py-2 px-3">Parallel Matrix Accelerator</td>
                 <td className="py-2 px-3 font-bold" style={{ color: 'var(--warn)' }}>1.8V VCCO</td>
-                <td className="py-2 px-3 font-bold" style={{ color: 'var(--warn)' }}>TXB0108 / LSF0108 Bidirectional</td>
+                <td className="py-2 px-3 font-bold" style={{ color: 'var(--warn)' }}>TI TXS0108E / TXB0108 Bidirectional</td>
                 <td className="py-2 px-3">SPI / FTDI USB FIFO (12 MB/s)</td>
                 <td className="py-2 px-3">Target (IEEE 1149.1 TAP Slave)</td>
               </tr>
