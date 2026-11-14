@@ -5,7 +5,6 @@ import {
   Cpu, 
   CircuitBoard, 
   BrainCircuit, 
-  ShieldCheck, 
   ArrowRight,
   Server
 } from 'lucide-react';
@@ -324,49 +323,6 @@ export default function DashboardView({ setActiveTab, serverStatus }) {
               style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
             >
               <span>Verify Math</span>
-              <ArrowRight className="w-3.5 h-3.5" style={{ color: 'var(--muted)' }} />
-            </div>
-          </div>
-
-          {/* Card 6: Reports & Verification */}
-          <div 
-            onClick={() => setActiveTab('reports')}
-            className="cursor-pointer rounded-[4px] border p-4 flex flex-col justify-between"
-            style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)' }}
-          >
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <div 
-                  className="w-7 h-7 rounded-[4px] border flex items-center justify-center"
-                  style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg)' }}
-                >
-                  <ShieldCheck className="w-4 h-4" style={{ color: 'var(--ok)' }} />
-                </div>
-                <span 
-                  className="text-[10px] font-mono border px-1.5 py-0.2 rounded-[4px]"
-                  style={{ borderColor: 'var(--ok)', color: 'var(--ok)' }}
-                >
-                  100 PTS
-                </span>
-              </div>
-              <h3 
-                className="font-semibold text-xs"
-                style={{ color: 'var(--text)' }}
-              >
-                Verification &amp; Technical Report
-              </h3>
-              <p 
-                className="text-[11px] mt-1.5 leading-relaxed"
-                style={{ color: 'var(--muted)' }}
-              >
-                Formal technical report, 100-point rubric breakdown, downloadable CSV results data, and AI assistance disclosure logs.
-              </p>
-            </div>
-            <div 
-              className="mt-3 pt-2.5 border-t flex items-center justify-between text-[11px] font-medium"
-              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
-            >
-              <span>View Report</span>
               <ArrowRight className="w-3.5 h-3.5" style={{ color: 'var(--muted)' }} />
             </div>
           </div>

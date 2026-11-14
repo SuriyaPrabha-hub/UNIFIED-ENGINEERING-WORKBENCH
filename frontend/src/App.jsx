@@ -6,7 +6,6 @@ import ThermalView from './views/ThermalView';
 import PerformanceView from './views/PerformanceView';
 import HardwareView from './views/HardwareView';
 import NeuralNetView from './views/NeuralNetView';
-import ReportsView from './views/ReportsView';
 import { api } from './api/client';
 import { RefreshCw } from 'lucide-react';
 
@@ -45,8 +44,6 @@ export default function App() {
         return <HardwareView />;
       case 'neural':
         return <NeuralNetView />;
-      case 'reports':
-        return <ReportsView />;
       default:
         return <DashboardView setActiveTab={setActiveTab} serverStatus={serverStatus} />;
     }

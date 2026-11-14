@@ -5,8 +5,7 @@ import {
   Flame, 
   Cpu, 
   CircuitBoard, 
-  BrainCircuit, 
-  FileText
+  BrainCircuit
 } from 'lucide-react';
 
 export default function Sidebar({ activeTab, setActiveTab, serverOnline }) {
@@ -17,7 +16,6 @@ export default function Sidebar({ activeTab, setActiveTab, serverOnline }) {
     { id: 'performance', label: 'Performance Lab', icon: Cpu, sub: 'Multicore Benchmarking' },
     { id: 'hardware', label: 'Hardware Integration', icon: CircuitBoard, sub: 'MCU / FPGA / JTAG' },
     { id: 'neural', label: 'Neural Network', icon: BrainCircuit, sub: 'Backprop & FD Check' },
-    { id: 'reports', label: 'Reports & Exports', icon: FileText, sub: 'Rubric & Evidence' },
   ];
 
   return (
