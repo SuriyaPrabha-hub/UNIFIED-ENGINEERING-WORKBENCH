@@ -1,19 +1,6 @@
-# Node & Frontend dependencies
-frontend/node_modules/
-frontend/.vite/
-.npm/
-
-# Build caches & temporary files
-*.log
-server_out.log
-server_err.log
+node_modules/
+dist/
 build/
-.cache/
-
-# Keep precompiled executables and assets necessary for standalone one-click execution
-!Launch.exe
-!Launch.bat
-!backend/workbench_server.exe
-!backend/tests/run_tests.exe
-!frontend/dist/
-!dist/
+.vscode/
+*.exe
+*.log
