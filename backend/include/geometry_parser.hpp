@@ -61,14 +61,22 @@ struct AnsysPointCloud {
 
 class GeometryParser {
 public:
+    static STLGeometry parseSTL(const std::string& buffer);
+    static STLGeometry parseBinarySTL(const std::string& buffer);
     static STLGeometry parseAsciiSTL(const std::string& content);
     static STLGeometry parseAsciiSTLFile(const std::string& filepath);
+    static STLGeometry parseSTLFile(const std::string& filepath);
 
     static AnsysPointCloud parseAnsysCSV(const std::string& content);
     static AnsysPointCloud parseAnsysCSVFile(const std::string& filepath);
 
+    // Benchmark 1D Rod (Task C Reference)
     static std::string generateSyntheticSampleSTL();
     static std::string generateSyntheticSampleAnsysCSV();
+
+    // Project LION - Biomimetic Quadruped Robot (Bio-Thermal FEA Showcase)
+    static std::string generateProjectLionSTL();
+    static std::string generateProjectLionAnsysCSV();
 };
 
 } // namespace workbench

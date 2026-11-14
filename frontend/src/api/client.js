@@ -58,11 +58,11 @@ export const api = {
     return await res.blob();
   },
 
-  // Geometry
-  parseSTL: (stlContent) => request('/geometry/parse-stl', {
+  // Geometry (Universal: Binary & ASCII STL, Any CSV format)
+  parseSTL: (stlData) => request('/geometry/parse-stl', {
     method: 'POST',
-    headers: { 'Content-Type': 'text/plain' },
-    body: stlContent
+    headers: { 'Content-Type': 'application/octet-stream' },
+    body: stlData
   }),
   parseAnsysCSV: (csvContent) => request('/geometry/parse-ansys-csv', {
     method: 'POST',
@@ -71,6 +71,8 @@ export const api = {
   }),
   getSampleSTL: () => request('/geometry/sample-stl'),
   getSampleAnsysCSV: () => request('/geometry/sample-ansys-csv'),
+  getSampleLionSTL: () => request('/geometry/sample-lion-stl'),
+  getSampleLionAnsysCSV: () => request('/geometry/sample-lion-ansys-csv'),
 
   // Performance Benchmark
   runBenchmark: (config) => request('/benchmark/run', {

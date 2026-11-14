@@ -67,21 +67,66 @@ void testThermalFEA() {
 void testGeometryParsers() {
     std::cout << "\n[TEST] 2. CAD STL & ANSYS CSV Parsers..." << std::endl;
 
-    // Test STL parsing
+    // Test 2.1: ASCII STL parsing (Benchmark Rod)
     std::string sample_stl = GeometryParser::generateSyntheticSampleSTL();
-    STLGeometry geom = GeometryParser::parseAsciiSTL(sample_stl);
+    STLGeometry geom = GeometryParser::parseSTL(sample_stl);
     assert(geom.triangle_count > 0);
     assert(geom.positions.size() == static_cast<size_t>(geom.triangle_count * 9));
     assert(geom.bbox.diag_size > 0.0);
-    std::cout << "  STL Parser: " << geom.triangle_count << " triangles parsed, BBox valid -> PASSED" << std::endl;
+    std::cout << "  ASCII STL Parser: " << geom.triangle_count << " triangles parsed, BBox valid -> PASSED" << std::endl;
 
-    // Test ANSYS CSV parsing
+    // Test 2.2: Binary STL parsing
+    // Build a minimal binary STL buffer: 80 bytes header + 4 bytes count (1 triangle) + 50 bytes triangle
+    std::vector<char> bin_stl(84 + 50, 0);
+    std::string header_text = "Binary STL Unit Test";
+    std::memcpy(bin_stl.data(), header_text.c_str(), header_text.size());
+    uint32_t one_tri = 1;
+    std::memcpy(bin_stl.data() + 80, &one_tri, 4);
+    // Triangle at offset 84: Normal(0,0,1), v1(0,0,0), v2(1,0,0), v3(0,1,0), attr(0)
+    float tri_data[12] = {0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f};
+    std::memcpy(bin_stl.data() + 84, tri_data, 48);
+    std::string bin_stl_str(bin_stl.data(), bin_stl.size());
+    STLGeometry bin_geom = GeometryParser::parseSTL(bin_stl_str);
+    assert(bin_geom.triangle_count == 1);
+    assert(bin_geom.validation_status == "VALID_BINARY_STL");
+    std::cout << "  Binary STL Parser: Successfully decoded IEEE 754 binary triangles -> PASSED" << std::endl;
+
+    // Test 2.3: Project LION Biomimetic Quadruped Model
+    std::string lion_stl = GeometryParser::generateProjectLionSTL();
+    STLGeometry lion_geom = GeometryParser::parseSTL(lion_stl);
+    assert(lion_geom.triangle_count > 200);
+    assert(lion_geom.bbox.diag_size > 0.5); // Lion quadruped dimensions
+    std::cout << "  Project LION Biomimetic STL: " << lion_geom.triangle_count 
+              << " triangles, BBox Diag: " << lion_geom.bbox.diag_size << " m -> PASSED" << std::endl;
+
+    // Test 2.4: Standard ANSYS CSV parsing
     std::string sample_csv = GeometryParser::generateSyntheticSampleAnsysCSV();
     AnsysPointCloud cloud = GeometryParser::parseAnsysCSV(sample_csv);
     assert(cloud.node_count > 0);
     assert(cloud.min_temp_C > 0.0 && cloud.max_temp_C > cloud.min_temp_C);
     std::cout << "  ANSYS CSV Parser: " << cloud.node_count << " nodes parsed (Temp: " 
               << cloud.min_temp_C << " C to " << cloud.max_temp_C << " C) -> PASSED" << std::endl;
+
+    // Test 2.5: Universal CSV parsing (Semicolon delimiter + mm coordinates + custom headers)
+    std::string custom_csv = 
+        "# Semicolon-delimited export from CAD/FEA\n"
+        "Point_ID;X [mm];Y [mm];Z [mm];Temperature (C)\n"
+        "101;0.0;0.0;0.0;85.5\n"
+        "102;100.0;50.0;20.0;65.2\n"
+        "103;200.0;100.0;40.0;45.0\n";
+    AnsysPointCloud custom_cloud = GeometryParser::parseAnsysCSV(custom_csv);
+    assert(custom_cloud.node_count == 3);
+    assert(std::abs(custom_cloud.nodes[1].x_m - 0.1) < 1e-4); // 100 mm auto-scaled to 0.1 m
+    std::cout << "  Universal CSV (Semicolon + mm auto-scaling): 3 nodes converted to SI meters -> PASSED" << std::endl;
+
+    // Test 2.6: Project LION ANSYS Nodal Distribution
+    std::string lion_csv = GeometryParser::generateProjectLionAnsysCSV();
+    AnsysPointCloud lion_cloud = GeometryParser::parseAnsysCSV(lion_csv);
+    assert(lion_cloud.node_count > 100);
+    assert(lion_cloud.max_temp_C > 88.0); // Hot BLDC joint motors
+    assert(lion_cloud.min_temp_C < 28.0); // Ambient ground paws
+    std::cout << "  Project LION ANSYS FEA Cloud: " << lion_cloud.node_count << " nodes (Range: " 
+              << lion_cloud.min_temp_C << " C to " << lion_cloud.max_temp_C << " C) -> PASSED" << std::endl;
 
     // Negative tests: Empty file rejection
     bool caught_empty_stl = false;

@@ -124,15 +124,15 @@ int main(int argc, char* argv[]) {
         }
     });
 
-    // 5. Geometry - Parse STL
+    // 5. Geometry - Parse STL (Universal: Auto-detects Binary & ASCII STL)
     svr.Post("/api/geometry/parse-stl", [](const httplib::Request& req, httplib::Response& res) {
         setCorsHeaders(res);
         try {
-            std::string content = req.body;
+            const std::string& content = req.body;
             if (content.empty()) {
                 throw std::invalid_argument("Empty request body: No STL data received.");
             }
-            STLGeometry geom = GeometryParser::parseAsciiSTL(content);
+            STLGeometry geom = GeometryParser::parseSTL(content);
             res.set_content(geom.toJson().dump(), "application/json");
         } catch (const std::exception& e) {
             json err;
@@ -142,11 +142,11 @@ int main(int argc, char* argv[]) {
         }
     });
 
-    // 6. Geometry - Parse ANSYS CSV
+    // 6. Geometry - Parse ANSYS CSV (Universal: Delimiters, mm/m units, flexible columns)
     svr.Post("/api/geometry/parse-ansys-csv", [](const httplib::Request& req, httplib::Response& res) {
         setCorsHeaders(res);
         try {
-            std::string content = req.body;
+            const std::string& content = req.body;
             if (content.empty()) {
                 throw std::invalid_argument("Empty request body: No CSV data received.");
             }
@@ -160,17 +160,31 @@ int main(int argc, char* argv[]) {
         }
     });
 
-    // 7. Geometry - Sample files
+    // 7. Geometry - Sample files (Benchmark Rod & Project LION)
     svr.Get("/api/geometry/sample-stl", [](const httplib::Request&, httplib::Response& res) {
         setCorsHeaders(res);
         std::string sample = GeometryParser::generateSyntheticSampleSTL();
-        STLGeometry geom = GeometryParser::parseAsciiSTL(sample);
+        STLGeometry geom = GeometryParser::parseSTL(sample);
         res.set_content(geom.toJson().dump(), "application/json");
     });
 
     svr.Get("/api/geometry/sample-ansys-csv", [](const httplib::Request&, httplib::Response& res) {
         setCorsHeaders(res);
         std::string sample = GeometryParser::generateSyntheticSampleAnsysCSV();
+        AnsysPointCloud cloud = GeometryParser::parseAnsysCSV(sample);
+        res.set_content(cloud.toJson().dump(), "application/json");
+    });
+
+    svr.Get("/api/geometry/sample-lion-stl", [](const httplib::Request&, httplib::Response& res) {
+        setCorsHeaders(res);
+        std::string sample = GeometryParser::generateProjectLionSTL();
+        STLGeometry geom = GeometryParser::parseSTL(sample);
+        res.set_content(geom.toJson().dump(), "application/json");
+    });
+
+    svr.Get("/api/geometry/sample-lion-ansys-csv", [](const httplib::Request&, httplib::Response& res) {
+        setCorsHeaders(res);
+        std::string sample = GeometryParser::generateProjectLionAnsysCSV();
         AnsysPointCloud cloud = GeometryParser::parseAnsysCSV(sample);
         res.set_content(cloud.toJson().dump(), "application/json");
     });
