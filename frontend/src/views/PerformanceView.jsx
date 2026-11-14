@@ -68,10 +68,13 @@ export default function PerformanceView() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div>
-          <h2 className="text-base font-bold text-[#1B1F23] tracking-tight flex items-center">
-            <Cpu className="w-4 h-4 text-[#5F6B76] mr-2" /> Multicore &amp; Parallel Execution Lab
+          <h2 
+            className="text-base font-bold tracking-tight flex items-center"
+            style={{ color: 'var(--text)' }}
+          >
+            <Cpu className="w-4 h-4 mr-2" style={{ color: 'var(--muted)' }} /> Multicore &amp; Parallel Execution Lab
           </h2>
-          <p className="text-xs text-[#5F6B76]">
+          <p className="text-xs" style={{ color: 'var(--muted)' }}>
             C++ bounded worker pool benchmarking with deterministic order and serial/parallel agreement verification.
           </p>
         </div>
@@ -79,7 +82,8 @@ export default function PerformanceView() {
         <button
           onClick={runBenchmark}
           disabled={loading}
-          className="px-3.5 py-1.5 rounded-[4px] bg-[#E8590C] hover:bg-[#d04f0a] text-xs font-semibold text-white flex items-center disabled:opacity-50"
+          className="px-3.5 py-1.5 rounded-[4px] text-xs font-semibold text-white flex items-center disabled:opacity-50 transition-none"
+          style={{ backgroundColor: 'var(--accent)', color: '#FFFFFF' }}
         >
           <Play className="w-3.5 h-3.5 mr-1.5 fill-current" /> Execute Benchmark Suite
         </button>
@@ -87,51 +91,66 @@ export default function PerformanceView() {
 
       {/* Error Alert */}
       {error && (
-        <div className="bg-[#FFF5F5] border border-[#C62828] rounded-[4px] p-3 flex items-start space-x-2 text-[#C62828] text-xs font-mono">
-          <AlertTriangle className="w-4 h-4 flex-shrink-0 text-[#C62828] mt-0.5" />
+        <div 
+          className="rounded-[4px] border p-3 flex items-start space-x-2 text-xs font-mono"
+          style={{ backgroundColor: 'var(--card)', borderColor: 'var(--err)', color: 'var(--err)' }}
+        >
+          <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: 'var(--err)' }} />
           <div>{error}</div>
         </div>
       )}
 
       {/* Hardware Specs & Configuration Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-        <div className="bg-[#FFFFFF] border border-[#D5D9DE] rounded-[4px] p-3.5">
-          <span className="text-[11px] text-[#5F6B76] font-semibold uppercase tracking-wider font-mono">Compiler</span>
-          <div className="text-base font-bold font-mono text-[#1B1F23] mt-0.5">
+        <div 
+          className="rounded-[4px] border p-3.5"
+          style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)' }}
+        >
+          <span className="text-[11px] font-semibold uppercase tracking-wider font-mono" style={{ color: 'var(--muted)' }}>Compiler</span>
+          <div className="text-base font-bold font-mono mt-0.5" style={{ color: 'var(--text)' }}>
             {benchmarkResult?.compiler_info || 'GCC 16.2.0'}
           </div>
-          <div className="text-[11px] text-[#5F6B76] font-mono">{benchmarkResult?.optimization_flags || '-O3 -pthread'}</div>
+          <div className="text-[11px] font-mono" style={{ color: 'var(--muted)' }}>{benchmarkResult?.optimization_flags || '-O3 -pthread'}</div>
         </div>
 
-        <div className="bg-[#FFFFFF] border border-[#D5D9DE] rounded-[4px] p-3.5">
-          <span className="text-[11px] text-[#5F6B76] font-semibold uppercase tracking-wider font-mono">Concurrency</span>
-          <div className="text-base font-bold font-mono text-[#1B1F23] mt-0.5">
+        <div 
+          className="rounded-[4px] border p-3.5"
+          style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)' }}
+        >
+          <span className="text-[11px] font-semibold uppercase tracking-wider font-mono" style={{ color: 'var(--muted)' }}>Concurrency</span>
+          <div className="text-base font-bold font-mono mt-0.5" style={{ color: 'var(--text)' }}>
             {benchmarkResult?.hardware_concurrency || 8} Logical CPUs
           </div>
-          <div className="text-[11px] text-[#5F6B76] font-mono">Tested 1, 2, 3, 4 worker threads</div>
+          <div className="text-[11px] font-mono" style={{ color: 'var(--muted)' }}>Tested 1, 2, 3, 4 worker threads</div>
         </div>
 
-        <div className="bg-[#FFFFFF] border border-[#D5D9DE] rounded-[4px] p-3.5">
-          <span className="text-[11px] text-[#5F6B76] font-semibold uppercase tracking-wider font-mono">Workload Batch</span>
-          <div className="text-base font-bold font-mono text-[#1B1F23] mt-0.5">
+        <div 
+          className="rounded-[4px] border p-3.5"
+          style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)' }}
+        >
+          <span className="text-[11px] font-semibold uppercase tracking-wider font-mono" style={{ color: 'var(--muted)' }}>Workload Batch</span>
+          <div className="text-base font-bold font-mono mt-0.5" style={{ color: 'var(--text)' }}>
             {config.case_count} Solves
           </div>
-          <div className="text-[11px] text-[#5F6B76] font-mono">N = {config.mesh_N} elements per solve</div>
+          <div className="text-[11px] font-mono" style={{ color: 'var(--muted)' }}>N = {config.mesh_N} elements per solve</div>
         </div>
 
-        <div className="bg-[#FFFFFF] border border-[#D5D9DE] rounded-[4px] p-3.5">
-          <span className="text-[11px] text-[#5F6B76] font-semibold uppercase tracking-wider font-mono">Serial/Parallel Agreement</span>
+        <div 
+          className="rounded-[4px] border p-3.5"
+          style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)' }}
+        >
+          <span className="text-[11px] font-semibold uppercase tracking-wider font-mono" style={{ color: 'var(--muted)' }}>Serial/Parallel Agreement</span>
           <div className="flex items-center space-x-1.5 mt-0.5">
             {benchmarkResult?.numerical_agreement_passed ? (
               <>
-                <CheckCircle2 className="w-4 h-4 text-[#2E7D32]" />
-                <span className="text-[#2E7D32] font-bold font-mono text-xs">PASS (diff &le; 1e-8 degC)</span>
+                <CheckCircle2 className="w-4 h-4" style={{ color: 'var(--ok)' }} />
+                <span className="font-bold font-mono text-xs" style={{ color: 'var(--ok)' }}>PASS (diff &le; 1e-8 degC)</span>
               </>
             ) : (
-              <span className="text-[#5F6B76] font-mono text-xs">Verifying...</span>
+              <span className="font-mono text-xs" style={{ color: 'var(--muted)' }}>Verifying...</span>
             )}
           </div>
-          <div className="text-[10px] text-[#5F6B76] font-mono mt-0.5">
+          <div className="text-[10px] font-mono mt-0.5" style={{ color: 'var(--muted)' }}>
             Max Diff: {benchmarkResult?.max_serial_parallel_diff_C?.toExponential(2) || '0.00e+00'} degC
           </div>
         </div>
@@ -140,12 +159,18 @@ export default function PerformanceView() {
       {/* Main Visualizations: Speedup & Execution Time */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Chart 1: Wall-Clock Execution Time (Grey shades) */}
-        <div className="bg-[#FFFFFF] border border-[#D5D9DE] rounded-[4px] p-4 space-y-2">
+        <div 
+          className="rounded-[4px] border p-4 space-y-2"
+          style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)' }}
+        >
           <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-[#1B1F23] flex items-center font-mono">
-              <Clock className="w-3.5 h-3.5 text-[#5F6B76] mr-1.5" /> Median Compute Time (5 Repetitions)
+            <h3 
+              className="text-xs font-bold uppercase tracking-wider flex items-center font-mono"
+              style={{ color: 'var(--text)' }}
+            >
+              <Clock className="w-3.5 h-3.5 mr-1.5" style={{ color: 'var(--muted)' }} /> Median Compute Time (5 Repetitions)
             </h3>
-            <span className="text-[11px] font-mono text-[#5F6B76]">Lower is better</span>
+            <span className="text-[11px] font-mono" style={{ color: 'var(--muted)' }}>Lower is better</span>
           </div>
 
           <div className="h-60 w-full">
@@ -167,12 +192,18 @@ export default function PerformanceView() {
         </div>
 
         {/* Chart 2: Speedup (Measured in solid grey, Ideal linear in dashed orange) */}
-        <div className="bg-[#FFFFFF] border border-[#D5D9DE] rounded-[4px] p-4 space-y-2">
+        <div 
+          className="rounded-[4px] border p-4 space-y-2"
+          style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)' }}
+        >
           <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-[#1B1F23] flex items-center font-mono">
-              <TrendingUp className="w-3.5 h-3.5 text-[#5F6B76] mr-1.5" /> Speedup (T1 / Tp) &amp; Scaling
+            <h3 
+              className="text-xs font-bold uppercase tracking-wider flex items-center font-mono"
+              style={{ color: 'var(--text)' }}
+            >
+              <TrendingUp className="w-3.5 h-3.5 mr-1.5" style={{ color: 'var(--muted)' }} /> Speedup (T1 / Tp) &amp; Scaling
             </h3>
-            <span className="text-[11px] font-mono text-[#1B1F23] font-semibold">Higher is better</span>
+            <span className="text-[11px] font-mono font-semibold" style={{ color: 'var(--text)' }}>Higher is better</span>
           </div>
 
           <div className="h-60 w-full">
@@ -197,14 +228,26 @@ export default function PerformanceView() {
       </div>
 
       {/* Detailed Benchmark Results Table */}
-      <div className="bg-[#FFFFFF] border border-[#D5D9DE] rounded-[4px] p-4 space-y-3">
-        <h3 className="text-xs font-bold uppercase tracking-wider text-[#1B1F23] font-mono">
+      <div 
+        className="rounded-[4px] border p-4 space-y-3"
+        style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)' }}
+      >
+        <h3 
+          className="text-xs font-bold uppercase tracking-wider font-mono"
+          style={{ color: 'var(--text)' }}
+        >
           Formal Benchmark Repetition Matrix (Wall-Clock Compute Only)
         </h3>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs font-mono border border-[#D5D9DE]">
-            <thead className="bg-[#F4F5F7] text-[#5F6B76] border-b border-[#D5D9DE]">
+          <table 
+            className="w-full text-left text-xs font-mono border"
+            style={{ borderColor: 'var(--border)' }}
+          >
+            <thead 
+              className="border-b"
+              style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--border)', color: 'var(--muted)' }}
+            >
               <tr>
                 <th className="py-2 px-3">Workers</th>
                 <th className="py-2 px-3">Rep 1 (ms)</th>
@@ -212,28 +255,34 @@ export default function PerformanceView() {
                 <th className="py-2 px-3">Rep 3 (ms)</th>
                 <th className="py-2 px-3">Rep 4 (ms)</th>
                 <th className="py-2 px-3">Rep 5 (ms)</th>
-                <th className="py-2 px-3 font-bold text-[#1B1F23]">Median (ms)</th>
-                <th className="py-2 px-3 font-bold text-[#1B1F23]">Speedup</th>
-                <th className="py-2 px-3 font-bold text-[#1B1F23]">Efficiency</th>
+                <th className="py-2 px-3 font-bold" style={{ color: 'var(--text)' }}>Median (ms)</th>
+                <th className="py-2 px-3 font-bold" style={{ color: 'var(--text)' }}>Speedup</th>
+                <th className="py-2 px-3 font-bold" style={{ color: 'var(--text)' }}>Efficiency</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#D5D9DE] text-[#1B1F23]">
+            <tbody 
+              className="divide-y"
+              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+            >
               {benchmarkResult?.workers?.map((w) => (
-                <tr key={w.num_workers} className="hover:bg-[#F4F5F7]">
-                  <td className="py-1.5 px-3 font-bold text-[#1B1F23]">{w.num_workers} Worker{w.num_workers > 1 ? 's' : ''}</td>
+                <tr key={w.num_workers}>
+                  <td className="py-1.5 px-3 font-bold">{w.num_workers} Worker{w.num_workers > 1 ? 's' : ''}</td>
                   {w.repetitions_ms?.map((r, i) => (
-                    <td key={i} className="py-1.5 px-3 text-[#5F6B76]">{r.toFixed(2)}</td>
+                    <td key={i} className="py-1.5 px-3" style={{ color: 'var(--muted)' }}>{r.toFixed(2)}</td>
                   ))}
-                  <td className="py-1.5 px-3 font-bold text-[#1B1F23]">{w.median_time_ms.toFixed(2)}</td>
-                  <td className="py-1.5 px-3 font-bold text-[#1B1F23]">{w.speedup.toFixed(2)}x</td>
-                  <td className="py-1.5 px-3 font-bold text-[#1B1F23]">{(w.efficiency * 100).toFixed(1)}%</td>
+                  <td className="py-1.5 px-3 font-bold">{w.median_time_ms.toFixed(2)}</td>
+                  <td className="py-1.5 px-3 font-bold">{w.speedup.toFixed(2)}x</td>
+                  <td className="py-1.5 px-3 font-bold">{(w.efficiency * 100).toFixed(1)}%</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
 
-        <div className="p-3 bg-[#F4F5F7] rounded-[4px] border border-[#D5D9DE] text-xs text-[#1B1F23] leading-relaxed">
+        <div 
+          className="p-3 rounded-[4px] border text-xs leading-relaxed"
+          style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--border)', color: 'var(--text)' }}
+        >
           <span className="font-bold">Analysis of Overhead &amp; Limitations:</span> Speedup scales close to linear for 2 and 3 threads, with efficiency leveling at 4 threads. 
           The observed sub-linear efficiency is governed by: (1) Thread spawn and join synchronization overhead, (2) L2/L3 CPU cache contention and memory bus saturation during simultaneous matrix assemblies, 
           and (3) Dynamic OS thread scheduling. File I/O and GUI rendering were strictly decoupled and excluded from the measurement loop via high-resolution monotonic clocks.

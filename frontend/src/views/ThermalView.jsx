@@ -118,10 +118,13 @@ export default function ThermalView() {
       {/* View Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div>
-          <h2 className="text-base font-bold text-[#1B1F23] tracking-tight flex items-center">
-            <Flame className="w-4 h-4 text-[#E8590C] mr-2" /> 1D Mechanical Thermal FEA Solver
+          <h2 
+            className="text-base font-bold tracking-tight flex items-center"
+            style={{ color: 'var(--text)' }}
+          >
+            <Flame className="w-4 h-4 mr-2" style={{ color: 'var(--accent)' }} /> 1D Mechanical Thermal FEA Solver
           </h2>
-          <p className="text-xs text-[#5F6B76]">
+          <p className="text-xs" style={{ color: 'var(--muted)' }}>
             Steady-state Galerkin linear finite element formulation with volumetric heat generation &amp; exact analytical verification.
           </p>
         </div>
@@ -129,14 +132,16 @@ export default function ThermalView() {
         <div className="flex items-center space-x-2">
           <button
             onClick={handleExportCSV}
-            className="px-3 py-1.5 rounded-[4px] bg-[#FFFFFF] hover:bg-[#F4F5F7] border border-[#D5D9DE] text-xs font-semibold text-[#1B1F23] flex items-center"
+            className="px-3 py-1.5 rounded-[4px] border text-xs font-semibold flex items-center transition-none"
+            style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--text)' }}
           >
-            <Download className="w-3.5 h-3.5 mr-1.5 text-[#5F6B76]" /> Export CSV
+            <Download className="w-3.5 h-3.5 mr-1.5" style={{ color: 'var(--muted)' }} /> Export CSV
           </button>
           <button
             onClick={() => { handleSolve(); handleConvergenceStudy(); }}
             disabled={loading}
-            className="px-3.5 py-1.5 rounded-[4px] bg-[#E8590C] hover:bg-[#d04f0a] text-xs font-semibold text-white flex items-center disabled:opacity-50"
+            className="px-3.5 py-1.5 rounded-[4px] text-xs font-semibold text-white flex items-center disabled:opacity-50 transition-none"
+            style={{ backgroundColor: 'var(--accent)', color: '#FFFFFF' }}
           >
             <Play className="w-3.5 h-3.5 mr-1.5 fill-current" /> Run FEA Solve
           </button>
@@ -145,11 +150,14 @@ export default function ThermalView() {
 
       {/* Error Alert */}
       {error && !loading && (
-        <div className="bg-[#FFF5F5] border border-[#C62828] rounded-[4px] p-3 flex items-start space-x-2 text-xs font-mono text-[#C62828]">
-          <AlertCircle className="w-4 h-4 text-[#C62828] mt-0.5 flex-shrink-0" />
+        <div 
+          className="border rounded-[4px] p-3 flex items-start space-x-2 text-xs font-mono"
+          style={{ backgroundColor: 'var(--card)', borderColor: 'var(--err)', color: 'var(--err)' }}
+        >
+          <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: 'var(--err)' }} />
           <div>
             <div className="font-bold">{error}</div>
-            <div className="mt-0.5 text-[11px] text-[#5F6B76]">
+            <div className="mt-0.5 text-[11px]" style={{ color: 'var(--muted)' }}>
               Ensure backend server is running via Launch.bat (Port 8080).
             </div>
           </div>
@@ -159,16 +167,22 @@ export default function ThermalView() {
       {/* Main Grid: Parameters + Output */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         {/* Left Col: Parameter Configuration Panel */}
-        <div className="bg-[#FFFFFF] border border-[#D5D9DE] rounded-[4px] p-4 space-y-3">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-[#1B1F23] flex items-center pb-2 border-b border-[#D5D9DE] font-mono">
-            <Settings className="w-3.5 h-3.5 text-[#5F6B76] mr-1.5" /> Model Parameters
+        <div 
+          className="border rounded-[4px] p-4 space-y-3"
+          style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)' }}
+        >
+          <h3 
+            className="text-xs font-bold uppercase tracking-wider flex items-center pb-2 border-b font-mono"
+            style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+          >
+            <Settings className="w-3.5 h-3.5 mr-1.5" style={{ color: 'var(--muted)' }} /> Model Parameters
           </h3>
 
           <div className="space-y-2.5 text-xs">
             <div>
-              <label className="text-[#5F6B76] flex justify-between text-[11px]">
+              <label className="flex justify-between text-[11px]" style={{ color: 'var(--muted)' }}>
                 <span>Rod Length L (m)</span>
-                <span className="font-mono text-[#1B1F23] font-semibold">{params.L} m</span>
+                <span className="font-mono font-semibold" style={{ color: 'var(--text)' }}>{params.L} m</span>
               </label>
               <input
                 type="number"
@@ -176,28 +190,30 @@ export default function ThermalView() {
                 min="0.1"
                 value={params.L}
                 onChange={(e) => setParams({ ...params, L: parseFloat(e.target.value) || 1.0 })}
-                className="w-full mt-1 bg-[#FFFFFF] border border-[#D5D9DE] rounded-[4px] px-2.5 py-1 text-xs text-[#1B1F23] font-mono"
+                className="w-full mt-1 border rounded-[4px] px-2.5 py-1 text-xs font-mono"
+                style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--text)' }}
               />
             </div>
 
             <div>
-              <label className="text-[#5F6B76] flex justify-between text-[11px]">
+              <label className="flex justify-between text-[11px]" style={{ color: 'var(--muted)' }}>
                 <span>Cross Section A (m²)</span>
-                <span className="font-mono text-[#1B1F23] font-semibold">1.0e-4 m²</span>
+                <span className="font-mono font-semibold" style={{ color: 'var(--text)' }}>1.0e-4 m²</span>
               </label>
               <input
                 type="number"
                 step="0.00001"
                 value={params.A}
                 onChange={(e) => setParams({ ...params, A: parseFloat(e.target.value) || 1e-4 })}
-                className="w-full mt-1 bg-[#FFFFFF] border border-[#D5D9DE] rounded-[4px] px-2.5 py-1 text-xs text-[#1B1F23] font-mono"
+                className="w-full mt-1 border rounded-[4px] px-2.5 py-1 text-xs font-mono"
+                style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--text)' }}
               />
             </div>
 
             <div>
-              <label className="text-[#5F6B76] flex justify-between text-[11px]">
+              <label className="flex justify-between text-[11px]" style={{ color: 'var(--muted)' }}>
                 <span>Conductivity k</span>
-                <span className="font-mono text-[#1B1F23] font-semibold">{params.k} W/(m·K)</span>
+                <span className="font-mono font-semibold" style={{ color: 'var(--text)' }}>{params.k} W/(m·K)</span>
               </label>
               <input
                 type="number"
@@ -205,47 +221,51 @@ export default function ThermalView() {
                 min="0.1"
                 value={params.k}
                 onChange={(e) => setParams({ ...params, k: parseFloat(e.target.value) || 10.0 })}
-                className="w-full mt-1 bg-[#FFFFFF] border border-[#D5D9DE] rounded-[4px] px-2.5 py-1 text-xs text-[#1B1F23] font-mono"
+                className="w-full mt-1 border rounded-[4px] px-2.5 py-1 text-xs font-mono"
+                style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--text)' }}
               />
             </div>
 
             <div>
-              <label className="text-[#5F6B76] flex justify-between text-[11px]">
+              <label className="flex justify-between text-[11px]" style={{ color: 'var(--muted)' }}>
                 <span>Heat Generation q</span>
-                <span className="font-mono text-[#1B1F23] font-semibold">{params.q} W/m³</span>
+                <span className="font-mono font-semibold" style={{ color: 'var(--text)' }}>{params.q} W/m³</span>
               </label>
               <input
                 type="number"
                 step="1000"
                 value={params.q}
                 onChange={(e) => setParams({ ...params, q: parseFloat(e.target.value) || 10000.0 })}
-                className="w-full mt-1 bg-[#FFFFFF] border border-[#D5D9DE] rounded-[4px] px-2.5 py-1 text-xs text-[#1B1F23] font-mono"
+                className="w-full mt-1 border rounded-[4px] px-2.5 py-1 text-xs font-mono"
+                style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--text)' }}
               />
             </div>
 
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="text-[#5F6B76] block text-[11px]">T(0) Left (degC)</label>
+                <label className="block text-[11px]" style={{ color: 'var(--muted)' }}>T(0) Left (degC)</label>
                 <input
                   type="number"
                   value={params.T_0}
                   onChange={(e) => setParams({ ...params, T_0: parseFloat(e.target.value) || 100.0 })}
-                  className="w-full mt-1 bg-[#FFFFFF] border border-[#D5D9DE] rounded-[4px] px-2 py-1 text-xs text-[#1B1F23] font-mono"
+                  className="w-full mt-1 border rounded-[4px] px-2 py-1 text-xs font-mono"
+                  style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--text)' }}
                 />
               </div>
               <div>
-                <label className="text-[#5F6B76] block text-[11px]">T(L) Right (degC)</label>
+                <label className="block text-[11px]" style={{ color: 'var(--muted)' }}>T(L) Right (degC)</label>
                 <input
                   type="number"
                   value={params.T_L}
                   onChange={(e) => setParams({ ...params, T_L: parseFloat(e.target.value) || 20.0 })}
-                  className="w-full mt-1 bg-[#FFFFFF] border border-[#D5D9DE] rounded-[4px] px-2 py-1 text-xs text-[#1B1F23] font-mono"
+                  className="w-full mt-1 border rounded-[4px] px-2 py-1 text-xs font-mono"
+                  style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--text)' }}
                 />
               </div>
             </div>
 
             <div>
-              <label className="text-[#5F6B76] block mb-1 text-[11px]">
+              <label className="block mb-1 text-[11px]" style={{ color: 'var(--muted)' }}>
                 Mesh Elements N (Uniform):
               </label>
               <div className="grid grid-cols-4 gap-1">
@@ -257,11 +277,13 @@ export default function ThermalView() {
                       const updated = { ...params, num_elements: n };
                       setParams(updated);
                     }}
-                    className={`py-1 text-xs font-mono rounded-[4px] border transition-none ${
-                      params.num_elements === n
-                        ? 'bg-[#E8590C] border-[#E8590C] text-white font-bold'
-                        : 'border-[#D5D9DE] bg-[#FFFFFF] hover:bg-[#F4F5F7] text-[#1B1F23]'
-                    }`}
+                    className="py-1 text-xs font-mono rounded-[4px] border transition-none"
+                    style={{
+                      backgroundColor: params.num_elements === n ? 'var(--accent)' : 'var(--card)',
+                      borderColor: params.num_elements === n ? 'var(--accent)' : 'var(--border)',
+                      color: params.num_elements === n ? '#FFFFFF' : 'var(--text)',
+                      fontWeight: params.num_elements === n ? 'bold' : 'normal'
+                    }}
                   >
                     N={n}
                   </button>
@@ -272,19 +294,22 @@ export default function ThermalView() {
 
           {/* Active Mesh Metrics Card */}
           {solution && (
-            <div className="p-2.5 bg-[#F4F5F7] rounded-[4px] border border-[#D5D9DE] text-xs font-mono space-y-1">
-              <div className="text-[10px] font-bold uppercase text-[#5F6B76]">Active Solution Metrics:</div>
+            <div 
+              className="p-2.5 rounded-[4px] border text-xs font-mono space-y-1"
+              style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--border)' }}
+            >
+              <div className="text-[10px] font-bold uppercase" style={{ color: 'var(--muted)' }}>Active Solution Metrics:</div>
               <div className="flex justify-between">
-                <span className="text-[#5F6B76]">Element h:</span>
-                <span className="text-[#1B1F23] font-bold">{solution.element_length_h?.toFixed(4)} m</span>
+                <span style={{ color: 'var(--muted)' }}>Element h:</span>
+                <span className="font-bold" style={{ color: 'var(--text)' }}>{solution.element_length_h?.toFixed(4)} m</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#5F6B76]">Nodes:</span>
-                <span className="text-[#1B1F23] font-bold">{solution.nodes?.length ?? 0}</span>
+                <span style={{ color: 'var(--muted)' }}>Nodes:</span>
+                <span className="font-bold" style={{ color: 'var(--text)' }}>{solution.nodes?.length ?? 0}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#5F6B76]">Max Midpoint Err:</span>
-                <span className="text-[#B7791F] font-bold">{solution.max_midpoint_error_C?.toFixed(5)} degC</span>
+                <span style={{ color: 'var(--muted)' }}>Max Midpoint Err:</span>
+                <span className="font-bold" style={{ color: 'var(--warn)' }}>{solution.max_midpoint_error_C?.toFixed(5)} degC</span>
               </div>
             </div>
           )}
@@ -292,35 +317,35 @@ export default function ThermalView() {
 
         {/* Right Col: Visualizations & Study */}
         <div className="lg:col-span-3 space-y-4">
-          {/* Sub-tabs */}
-          <div className="flex items-center space-x-1 border-b border-[#D5D9DE] pb-1">
+          {/* Sub-tabs with accent indicator on active tab */}
+          <div className="flex items-center space-x-1 border-b pb-1" style={{ borderColor: 'var(--border)' }}>
             <button
               onClick={() => setActiveSubTab('solution')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-[4px] transition-none ${
-                activeSubTab === 'solution'
-                  ? 'border-b-2 border-[#E8590C] text-[#E8590C]'
-                  : 'text-[#5F6B76] hover:text-[#1B1F23]'
-              }`}
+              className="px-3 py-1.5 text-xs font-semibold rounded-[4px] transition-none"
+              style={{
+                borderBottom: activeSubTab === 'solution' ? '2px solid var(--accent)' : '2px solid transparent',
+                color: activeSubTab === 'solution' ? 'var(--accent)' : 'var(--muted)'
+              }}
             >
               Temperature Distribution T(x)
             </button>
             <button
               onClick={() => setActiveSubTab('convergence')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-[4px] transition-none ${
-                activeSubTab === 'convergence'
-                  ? 'border-b-2 border-[#E8590C] text-[#E8590C]'
-                  : 'text-[#5F6B76] hover:text-[#1B1F23]'
-              }`}
+              className="px-3 py-1.5 text-xs font-semibold rounded-[4px] transition-none"
+              style={{
+                borderBottom: activeSubTab === 'convergence' ? '2px solid var(--accent)' : '2px solid transparent',
+                color: activeSubTab === 'convergence' ? 'var(--accent)' : 'var(--muted)'
+              }}
             >
               Mesh Convergence Study (N=10, 20, 40, 80)
             </button>
             <button
               onClick={() => setActiveSubTab('table')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-[4px] transition-none ${
-                activeSubTab === 'table'
-                  ? 'border-b-2 border-[#E8590C] text-[#E8590C]'
-                  : 'text-[#5F6B76] hover:text-[#1B1F23]'
-              }`}
+              className="px-3 py-1.5 text-xs font-semibold rounded-[4px] transition-none"
+              style={{
+                borderBottom: activeSubTab === 'table' ? '2px solid var(--accent)' : '2px solid transparent',
+                color: activeSubTab === 'table' ? 'var(--accent)' : 'var(--muted)'
+              }}
             >
               Nodal &amp; Midpoint Data Table
             </button>
@@ -328,12 +353,21 @@ export default function ThermalView() {
 
           {/* Sub-tab 1: Temperature Curve */}
           {activeSubTab === 'solution' && (
-            <div className="bg-[#FFFFFF] border border-[#D5D9DE] rounded-[4px] p-4 space-y-3">
+            <div 
+              className="border rounded-[4px] p-4 space-y-3"
+              style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)' }}
+            >
               <div className="flex items-center justify-between">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-[#1B1F23] font-mono">
+                <h3 
+                  className="text-xs font-bold uppercase tracking-wider font-mono"
+                  style={{ color: 'var(--text)' }}
+                >
                   Temperature Profile along Rod Axis x in [0, {params.L}] m
                 </h3>
-                <span className="text-[10px] text-[#2E7D32] font-mono border border-[#2E7D32] px-1.5 py-0.2 rounded-[2px]">
+                <span 
+                  className="text-[10px] font-mono border px-1.5 py-0.2 rounded-[2px]"
+                  style={{ borderColor: 'var(--ok)', color: 'var(--ok)' }}
+                >
                   Nodal Error &lt; 1e-12 degC (Superconvergent)
                 </span>
               </div>
@@ -343,7 +377,7 @@ export default function ThermalView() {
                   <LoadingSpinner text="Solving steady-state FEM in C++..." />
                 </div>
               ) : chartData.length === 0 ? (
-                <div className="h-72 flex items-center justify-center text-xs text-[#5F6B76] font-mono">
+                <div className="h-72 flex items-center justify-center text-xs font-mono" style={{ color: 'var(--muted)' }}>
                   No data. Click "Run FEA Solve" to compute.
                 </div>
               ) : (
@@ -389,8 +423,11 @@ export default function ThermalView() {
                 </div>
               )}
 
-              <div className="p-3 bg-[#F4F5F7] rounded-[4px] border border-[#D5D9DE] text-xs text-[#1B1F23] leading-relaxed">
-                <span className="font-bold text-[#1B1F23]">Physical Interpretation:</span> With uniform internal heat generation <span className="font-mono font-semibold">q = 10,000 W/m³</span>, 
+              <div 
+                className="p-3 rounded-[4px] border text-xs leading-relaxed"
+                style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--border)', color: 'var(--text)' }}
+              >
+                <span className="font-bold">Physical Interpretation:</span> With uniform internal heat generation <span className="font-mono font-semibold">q = 10,000 W/m³</span>, 
                 the temperature profile displays a parabolic interior peak (max temperature ~188 degC at x ≈ 0.42 m) exceeding boundary values (T(0)=100 degC, T(L)=20 degC).
               </div>
             </div>
@@ -398,12 +435,21 @@ export default function ThermalView() {
 
           {/* Sub-tab 2: Convergence Study */}
           {activeSubTab === 'convergence' && (
-            <div className="bg-[#FFFFFF] border border-[#D5D9DE] rounded-[4px] p-4 space-y-3">
+            <div 
+              className="border rounded-[4px] p-4 space-y-3"
+              style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)' }}
+            >
               <div className="flex items-center justify-between">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-[#1B1F23] font-mono">
+                <h3 
+                  className="text-xs font-bold uppercase tracking-wider font-mono"
+                  style={{ color: 'var(--text)' }}
+                >
                   Mesh Convergence Analysis: Max Midpoint Error vs Element Size h
                 </h3>
-                <span className="text-[10px] text-[#2E7D32] font-mono border border-[#2E7D32] px-1.5 py-0.2 rounded-[2px]">
+                <span 
+                  className="text-[10px] font-mono border px-1.5 py-0.2 rounded-[2px]"
+                  style={{ borderColor: 'var(--ok)', color: 'var(--ok)' }}
+                >
                   O(h²) Quadratic Convergence Verified
                 </span>
               </div>
@@ -416,8 +462,14 @@ export default function ThermalView() {
                 <>
                   {/* Convergence Table */}
                   <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs font-mono border border-[#D5D9DE]">
-                      <thead className="bg-[#F4F5F7] text-[#5F6B76] border-b border-[#D5D9DE]">
+                    <table 
+                      className="w-full text-left text-xs font-mono border"
+                      style={{ borderColor: 'var(--border)' }}
+                    >
+                      <thead 
+                        className="border-b"
+                        style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--border)', color: 'var(--muted)' }}
+                      >
                         <tr>
                           <th className="py-2 px-3">Elements N</th>
                           <th className="py-2 px-3">Element Size h (m)</th>
@@ -426,17 +478,20 @@ export default function ThermalView() {
                           <th className="py-2 px-3">Observed Reduction Ratio</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-[#D5D9DE] text-[#1B1F23]">
+                      <tbody 
+                        className="divide-y"
+                        style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+                      >
                         {convPlotData.map((row, i) => {
                           const prev = i > 0 ? convPlotData[i - 1].max_error : null;
                           const ratio = prev ? (prev / row.max_error).toFixed(3) : '-';
                           return (
-                            <tr key={row.N} className="hover:bg-[#F4F5F7]">
-                              <td className="py-1.5 px-3 font-bold text-[#1B1F23]">N = {row.N}</td>
+                            <tr key={row.N}>
+                              <td className="py-1.5 px-3 font-bold">{row.N}</td>
                               <td className="py-1.5 px-3">{row.h} m</td>
-                              <td className="py-1.5 px-3 font-bold text-[#B7791F]">{row.max_error} degC</td>
-                              <td className="py-1.5 px-3 text-[#5F6B76]">{row.theoretical_err} degC</td>
-                              <td className="py-1.5 px-3 font-bold text-[#2E7D32]">{ratio}x {ratio !== '-' ? '(~4.00x O(h²))' : ''}</td>
+                              <td className="py-1.5 px-3 font-bold" style={{ color: 'var(--warn)' }}>{row.max_error} degC</td>
+                              <td className="py-1.5 px-3" style={{ color: 'var(--muted)' }}>{row.theoretical_err} degC</td>
+                              <td className="py-1.5 px-3 font-bold" style={{ color: 'var(--ok)' }}>{ratio}x {ratio !== '-' ? '(~4.00x O(h²))' : ''}</td>
                             </tr>
                           );
                         })}
@@ -462,7 +517,10 @@ export default function ThermalView() {
                 </>
               )}
 
-              <div className="p-3 bg-[#F4F5F7] rounded-[4px] border border-[#D5D9DE] text-xs text-[#1B1F23] leading-relaxed">
+              <div 
+                className="p-3 rounded-[4px] border text-xs leading-relaxed"
+                style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--border)', color: 'var(--text)' }}
+              >
                 <span className="font-bold">Interdisciplinary Adoption &amp; Debugging Insight:</span> In 1D linear FEA with constant properties and uniform heat generation, 
                 nodal solutions match the exact analytical solution to machine precision (&lt; 1e-12 degC) due to Green's function exactness at nodes (nodal superconvergence). 
                 Evaluating errors at element midpoints via shape function interpolation (T_e + T_e+1)/2 reveals the true piecewise-linear approximation error q·h²/(8k), 
@@ -473,19 +531,31 @@ export default function ThermalView() {
 
           {/* Sub-tab 3: Nodal Table */}
           {activeSubTab === 'table' && (
-            <div className="bg-[#FFFFFF] border border-[#D5D9DE] rounded-[4px] p-4 space-y-3">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-[#1B1F23] font-mono">
+            <div 
+              className="border rounded-[4px] p-4 space-y-3"
+              style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)' }}
+            >
+              <h3 
+                className="text-xs font-bold uppercase tracking-wider font-mono"
+                style={{ color: 'var(--text)' }}
+              >
                 Numerical Output (N = {params.num_elements})
               </h3>
 
               {!solution ? (
-                <div className="py-8 text-center text-xs text-[#5F6B76] font-mono">
+                <div className="py-8 text-center text-xs font-mono" style={{ color: 'var(--muted)' }}>
                   No data loaded. Click "Run FEA Solve" first.
                 </div>
               ) : (
                 <div className="max-h-96 overflow-y-auto">
-                  <table className="w-full text-left text-xs font-mono border border-[#D5D9DE]">
-                    <thead className="bg-[#F4F5F7] text-[#5F6B76] sticky top-0 border-b border-[#D5D9DE]">
+                  <table 
+                    className="w-full text-left text-xs font-mono border"
+                    style={{ borderColor: 'var(--border)' }}
+                  >
+                    <thead 
+                      className="sticky top-0 border-b"
+                      style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--border)', color: 'var(--muted)' }}
+                    >
                       <tr>
                         <th className="py-1.5 px-3">Type</th>
                         <th className="py-1.5 px-3">Index</th>
@@ -495,25 +565,28 @@ export default function ThermalView() {
                         <th className="py-1.5 px-3">Abs Error (degC)</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#D5D9DE] text-[#1B1F23]">
+                    <tbody 
+                      className="divide-y"
+                      style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+                    >
                       {solution.nodes.map((n) => (
-                        <tr key={`n-${n.node_id}`} className="hover:bg-[#F4F5F7]">
-                          <td className="py-1 px-3 text-[#5F6B76] font-semibold">Node</td>
+                        <tr key={`n-${n.node_id}`}>
+                          <td className="py-1 px-3 font-semibold" style={{ color: 'var(--muted)' }}>Node</td>
                           <td className="py-1 px-3">#{n.node_id}</td>
                           <td className="py-1 px-3">{n.x_m.toFixed(4)}</td>
                           <td className="py-1 px-3 font-bold">{n.T_fe_C.toFixed(4)}</td>
                           <td className="py-1 px-3">{n.T_exact_C.toFixed(4)}</td>
-                          <td className="py-1 px-3 text-[#2E7D32]">{n.abs_error_C.toExponential(4)}</td>
+                          <td className="py-1 px-3" style={{ color: 'var(--ok)' }}>{n.abs_error_C.toExponential(4)}</td>
                         </tr>
                       ))}
                       {solution.midpoints.map((m) => (
-                        <tr key={`m-${m.element_id}`} className="hover:bg-[#F4F5F7] bg-[#F9FAFB]">
-                          <td className="py-1 px-3 text-[#B7791F] font-semibold">Midpoint</td>
+                        <tr key={`m-${m.element_id}`} style={{ backgroundColor: 'var(--bg)' }}>
+                          <td className="py-1 px-3 font-semibold" style={{ color: 'var(--warn)' }}>Midpoint</td>
                           <td className="py-1 px-3">Elem #{m.element_id}</td>
                           <td className="py-1 px-3">{m.x_mid_m.toFixed(4)}</td>
                           <td className="py-1 px-3 font-bold">{m.T_fe_C.toFixed(4)}</td>
                           <td className="py-1 px-3">{m.T_exact_C.toFixed(4)}</td>
-                          <td className="py-1 px-3 text-[#B7791F]">{m.abs_error_C.toFixed(6)}</td>
+                          <td className="py-1 px-3" style={{ color: 'var(--warn)' }}>{m.abs_error_C.toFixed(6)}</td>
                         </tr>
                       ))}
                     </tbody>

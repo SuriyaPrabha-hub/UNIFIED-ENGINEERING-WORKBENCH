@@ -17,7 +17,7 @@
 }
 
 @layer base {
-  * {
+  *, *::before, *::after {
     box-shadow: none !important;
   }
 
@@ -41,12 +41,12 @@
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #E5E8EC;
+  background: var(--bg);
 }
 ::-webkit-scrollbar-thumb {
-  background: #C0C5CC;
+  background: var(--border);
   border-radius: 2px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #A0A6AF;
+  background: var(--muted);
 }

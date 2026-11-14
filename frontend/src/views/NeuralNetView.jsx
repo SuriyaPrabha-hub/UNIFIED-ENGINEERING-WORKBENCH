@@ -61,7 +61,6 @@ export default function NeuralNetView() {
     }
   };
 
-  // Chart data for training history
   const lossHistoryData = [];
   if (simResult && simResult.history) {
     simResult.history.forEach((h) => {
@@ -79,10 +78,13 @@ export default function NeuralNetView() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div>
-          <h2 className="text-base font-bold text-[#1B1F23] tracking-tight flex items-center">
-            <BrainCircuit className="w-4 h-4 text-[#5F6B76] mr-2" /> Handwritten Backpropagation &amp; Gradient Verification
+          <h2 
+            className="text-base font-bold tracking-tight flex items-center"
+            style={{ color: 'var(--text)' }}
+          >
+            <BrainCircuit className="w-4 h-4 mr-2" style={{ color: 'var(--muted)' }} /> Handwritten Backpropagation &amp; Gradient Verification
           </h2>
-          <p className="text-xs text-[#5F6B76]">
+          <p className="text-xs" style={{ color: 'var(--muted)' }}>
             Manual chain-rule derivation verified against C++ central finite differences (ε=1e-6) without automatic differentiation.
           </p>
         </div>
@@ -90,14 +92,16 @@ export default function NeuralNetView() {
         <div className="flex items-center space-x-2">
           <button
             onClick={handleExportCSV}
-            className="px-3 py-1.5 rounded-[4px] bg-[#FFFFFF] hover:bg-[#F4F5F7] border border-[#D5D9DE] text-xs font-semibold text-[#1B1F23] flex items-center"
+            className="px-3 py-1.5 rounded-[4px] border text-xs font-semibold flex items-center transition-none"
+            style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--text)' }}
           >
-            <Download className="w-3.5 h-3.5 mr-1.5 text-[#5F6B76]" /> Export CSV
+            <Download className="w-3.5 h-3.5 mr-1.5" style={{ color: 'var(--muted)' }} /> Export CSV
           </button>
           <button
             onClick={runSimulation}
             disabled={loading}
-            className="px-3.5 py-1.5 rounded-[4px] bg-[#E8590C] hover:bg-[#d04f0a] text-xs font-semibold text-white flex items-center disabled:opacity-50"
+            className="px-3.5 py-1.5 rounded-[4px] text-xs font-semibold text-white flex items-center disabled:opacity-50 transition-none"
+            style={{ backgroundColor: 'var(--accent)', color: '#FFFFFF' }}
           >
             <Play className="w-3.5 h-3.5 mr-1.5 fill-current" /> Run Simulation
           </button>
@@ -106,59 +110,95 @@ export default function NeuralNetView() {
 
       {/* Error Alert */}
       {error && (
-        <div className="bg-[#FFF5F5] border border-[#C62828] rounded-[4px] p-3 flex items-start space-x-2 text-[#C62828] text-xs font-mono">
-          <AlertTriangle className="w-4 h-4 flex-shrink-0 text-[#C62828] mt-0.5" />
+        <div 
+          className="rounded-[4px] border p-3 flex items-start space-x-2 text-xs font-mono"
+          style={{ backgroundColor: 'var(--card)', borderColor: 'var(--err)', color: 'var(--err)' }}
+        >
+          <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: 'var(--err)' }} />
           <div>{error}</div>
         </div>
       )}
 
       {/* Top Problem Description Banner */}
-      <div className="bg-[#FFFFFF] border border-[#D5D9DE] rounded-[4px] p-4 space-y-2.5 font-mono text-xs">
-        <div className="flex items-center justify-between border-b border-[#D5D9DE] pb-2 font-sans font-bold text-[#1B1F23]">
+      <div 
+        className="rounded-[4px] border p-4 space-y-2.5 font-mono text-xs"
+        style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)' }}
+      >
+        <div 
+          className="flex items-center justify-between border-b pb-2 font-sans font-bold"
+          style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+        >
           <span className="flex items-center text-xs">
-            <Calculator className="w-3.5 h-3.5 text-[#5F6B76] mr-1.5" /> Single-Sample Regression Specification
+            <Calculator className="w-3.5 h-3.5 mr-1.5" style={{ color: 'var(--muted)' }} /> Single-Sample Regression Specification
           </span>
-          <span className="text-[#2E7D32] border border-[#2E7D32] px-2 py-0.2 rounded-[2px] font-mono text-[11px]">
+          <span 
+            className="border px-2 py-0.2 rounded-[2px] font-mono text-[11px]"
+            style={{ borderColor: 'var(--ok)', color: 'var(--ok)' }}
+          >
             x = 1.0, Target y = 2.0 | η = {learningRate}
           </span>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-[#1B1F23]">
-          <div className="p-2.5 bg-[#F4F5F7] rounded-[4px] border border-[#D5D9DE]">
-            <div className="text-[#5F6B76] text-[10px] uppercase font-bold mb-1">Architecture Equations</div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3" style={{ color: 'var(--text)' }}>
+          <div 
+            className="p-2.5 rounded-[4px] border"
+            style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--border)' }}
+          >
+            <div className="text-[10px] uppercase font-bold mb-1" style={{ color: 'var(--muted)' }}>Architecture Equations</div>
             <div>Hidden: h = tanh(w·x + b)</div>
             <div>Output: ŷ = v·h + c</div>
             <div>Loss: J = 0.5·(ŷ - y)²</div>
           </div>
-          <div className="p-2.5 bg-[#F4F5F7] rounded-[4px] border border-[#D5D9DE]">
-            <div className="text-[#5F6B76] text-[10px] uppercase font-bold mb-1">Initial Parameters (Step 0)</div>
+          <div 
+            className="p-2.5 rounded-[4px] border"
+            style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--border)' }}
+          >
+            <div className="text-[10px] uppercase font-bold mb-1" style={{ color: 'var(--muted)' }}>Initial Parameters (Step 0)</div>
             <div>w = 0.5, b = 0.0</div>
             <div>v = 1.0, c = 0.0</div>
             <div>Learning Rate η = {learningRate}</div>
           </div>
-          <div className="p-2.5 bg-[#F4F5F7] rounded-[4px] border border-[#D5D9DE]">
-            <div className="text-[#5F6B76] text-[10px] uppercase font-bold mb-1">Step 0 Numerical Values</div>
+          <div 
+            className="p-2.5 rounded-[4px] border"
+            style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--border)' }}
+          >
+            <div className="text-[10px] uppercase font-bold mb-1" style={{ color: 'var(--muted)' }}>Step 0 Numerical Values</div>
             <div>z = 0.50000, h = 0.46212</div>
             <div>ŷ = 0.46212, Err = -1.53788</div>
-            <div className="font-bold text-[#B7791F]">Initial Loss J = 1.18254</div>
+            <div className="font-bold" style={{ color: 'var(--warn)' }}>Initial Loss J = 1.18254</div>
           </div>
         </div>
       </div>
 
       {/* Finite Difference Gradient Verification Table */}
-      <div className="bg-[#FFFFFF] border border-[#D5D9DE] rounded-[4px] p-4 space-y-3">
+      <div 
+        className="rounded-[4px] border p-4 space-y-3"
+        style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)' }}
+      >
         <div className="flex items-center justify-between">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-[#1B1F23] flex items-center font-mono">
-            <CheckCircle2 className="w-3.5 h-3.5 text-[#2E7D32] mr-1.5" /> 
+          <h3 
+            className="text-xs font-bold uppercase tracking-wider flex items-center font-mono"
+            style={{ color: 'var(--text)' }}
+          >
+            <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" style={{ color: 'var(--ok)' }} /> 
             Central Finite Difference Gradient Verification (ε = 1.0e-6, Tolerance &le; 1.0e-5)
           </h3>
-          <span className="text-[10px] font-mono font-bold text-[#2E7D32] border border-[#2E7D32] px-1.5 py-0.2 rounded-[2px]">
+          <span 
+            className="text-[10px] font-mono font-bold border px-1.5 py-0.2 rounded-[2px]"
+            style={{ borderColor: 'var(--ok)', color: 'var(--ok)' }}
+          >
             ALL 4 GRADIENTS PASSED (Max Error &lt; 1e-10)
           </span>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs font-mono border border-[#D5D9DE]">
-            <thead className="bg-[#F4F5F7] text-[#5F6B76] border-b border-[#D5D9DE]">
+          <table 
+            className="w-full text-left text-xs font-mono border"
+            style={{ borderColor: 'var(--border)' }}
+          >
+            <thead 
+              className="border-b"
+              style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--border)', color: 'var(--muted)' }}
+            >
               <tr>
                 <th className="py-2 px-3">Parameter θ</th>
                 <th className="py-2 px-3">Chain-Rule Formula</th>
@@ -169,7 +209,10 @@ export default function NeuralNetView() {
                 <th className="py-2 px-3">Simultaneous Update (θ_new)</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#D5D9DE] text-[#1B1F23]">
+            <tbody 
+              className="divide-y"
+              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+            >
               {simResult?.gradient_checks?.map((chk) => {
                 const step1Val = simResult?.step1_updated_params?.[chk.param];
                 const formulaMap = {
@@ -179,18 +222,21 @@ export default function NeuralNetView() {
                   c: '(ŷ - y)·1'
                 };
                 return (
-                  <tr key={chk.param} className="hover:bg-[#F4F5F7]">
-                    <td className="py-1.5 px-3 font-bold text-[#1B1F23]">{chk.param}</td>
-                    <td className="py-1.5 px-3 text-[#5F6B76]">{formulaMap[chk.param]}</td>
-                    <td className="py-1.5 px-3 font-bold text-[#1B1F23]">{chk.analytical.toFixed(6)}</td>
-                    <td className="py-1.5 px-3 text-[#5F6B76]">{chk.numerical.toFixed(6)}</td>
-                    <td className="py-1.5 px-3 text-[#2E7D32] font-bold">{chk.abs_error.toExponential(4)}</td>
+                  <tr key={chk.param}>
+                    <td className="py-1.5 px-3 font-bold">{chk.param}</td>
+                    <td className="py-1.5 px-3" style={{ color: 'var(--muted)' }}>{formulaMap[chk.param]}</td>
+                    <td className="py-1.5 px-3 font-bold">{chk.analytical.toFixed(6)}</td>
+                    <td className="py-1.5 px-3" style={{ color: 'var(--muted)' }}>{chk.numerical.toFixed(6)}</td>
+                    <td className="py-1.5 px-3 font-bold" style={{ color: 'var(--ok)' }}>{chk.abs_error.toExponential(4)}</td>
                     <td className="py-1.5 px-3">
-                      <span className="inline-flex items-center text-[#2E7D32] border border-[#2E7D32] px-1.5 py-0.2 rounded-[2px] text-[10px] font-bold">
+                      <span 
+                        className="inline-flex items-center border px-1.5 py-0.2 rounded-[2px] text-[10px] font-bold"
+                        style={{ borderColor: 'var(--ok)', color: 'var(--ok)' }}
+                      >
                         PASS
                       </span>
                     </td>
-                    <td className="py-1.5 px-3 font-bold text-[#B7791F]">
+                    <td className="py-1.5 px-3 font-bold" style={{ color: 'var(--warn)' }}>
                       {step1Val ? step1Val.toFixed(6) : '-'}
                     </td>
                   </tr>
@@ -200,7 +246,10 @@ export default function NeuralNetView() {
           </table>
         </div>
 
-        <div className="p-3 bg-[#F4F5F7] rounded-[4px] border border-[#D5D9DE] text-xs text-[#1B1F23] leading-relaxed">
+        <div 
+          className="p-3 rounded-[4px] border text-xs leading-relaxed"
+          style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--border)', color: 'var(--text)' }}
+        >
           <span className="font-bold">Explanation of Gradient Direction:</span> All initial partial derivatives are negative (e.g. ∂J/∂w = -1.209465, ∂J/∂v = -0.710682) 
           because the initial prediction (ŷ = 0.462) is lower than the target (y = 2.0). 
           In gradient descent, parameters update via <span className="font-mono font-semibold">θ_new = θ - η·(∂J/∂θ)</span>; subtracting a negative gradient causes every parameter 
@@ -209,13 +258,19 @@ export default function NeuralNetView() {
       </div>
 
       {/* 100 Training Steps Loss Convergence Curve */}
-      <div className="bg-[#FFFFFF] border border-[#D5D9DE] rounded-[4px] p-4 space-y-3">
+      <div 
+        className="rounded-[4px] border p-4 space-y-3"
+        style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)' }}
+      >
         <div className="flex items-center justify-between">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-[#1B1F23] flex items-center font-mono">
-            <TrendingDown className="w-3.5 h-3.5 text-[#5F6B76] mr-1.5" /> 
+          <h3 
+            className="text-xs font-bold uppercase tracking-wider flex items-center font-mono"
+            style={{ color: 'var(--text)' }}
+          >
+            <TrendingDown className="w-3.5 h-3.5 mr-1.5" style={{ color: 'var(--muted)' }} /> 
             Training Loss J = 0.5·(ŷ - y)² Over 100 Steps (η = {learningRate})
           </h3>
-          <span className="text-[11px] font-mono text-[#2E7D32]">
+          <span className="text-[11px] font-mono" style={{ color: 'var(--ok)' }}>
             Final Loss: {simResult?.final_loss?.toExponential(4) || '0.00e+00'} | Final ŷ: {simResult?.final_prediction?.toFixed(4) || '2.0000'}
           </span>
         </div>
@@ -236,7 +291,10 @@ export default function NeuralNetView() {
           </ResponsiveContainer>
         </div>
 
-        <div className="p-3 bg-[#F4F5F7] rounded-[4px] border border-[#D5D9DE] text-xs text-[#1B1F23] leading-relaxed">
+        <div 
+          className="p-3 rounded-[4px] border text-xs leading-relaxed"
+          style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--border)', color: 'var(--text)' }}
+        >
           <span className="font-bold">Convergence Analysis:</span> Loss decreases monotonically from 1.1825 down to machine zero (~10⁻²⁰) within 70 iterations. 
           The hyperbolic tangent saturates smoothly while linear output weights v and c scale to match the target regression value y = 2.0.
         </div>

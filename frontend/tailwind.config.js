@@ -7,23 +7,21 @@ export default {
   theme: {
     extend: {
       colors: {
-        eng: {
-          bg: '#F4F5F7',
-          card: '#FFFFFF',
-          sidebar: '#1F2429',
-          'sidebar-text': '#C9CED4',
-          border: '#D5D9DE',
-          text: '#1B1F23',
-          muted: '#5F6B76',
-          accent: '#E8590C',
-          ok: '#2E7D32',
-          warn: '#B7791F',
-          err: '#C62828',
-        }
+        bg: 'var(--bg)',
+        card: 'var(--card)',
+        sidebar: 'var(--sidebar)',
+        'sidebar-text': 'var(--sidebar-text)',
+        border: 'var(--border)',
+        text: 'var(--text)',
+        muted: 'var(--muted)',
+        accent: 'var(--accent)',
+        ok: 'var(--ok)',
+        warn: 'var(--warn)',
+        err: 'var(--err)',
       },
       fontFamily: {
-        sans: ['Segoe UI', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-        mono: ['Consolas', 'Courier New', 'monospace'],
+        sans: ['"Segoe UI"', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        mono: ['Consolas', '"Courier New"', 'monospace'],
       },
       borderRadius: {
         DEFAULT: '4px',

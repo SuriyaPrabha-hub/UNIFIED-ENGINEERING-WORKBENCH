@@ -44,7 +44,7 @@ export default function GeometryView() {
     const width = mount.clientWidth || 800;
     const height = mount.clientHeight || 500;
 
-    // Scene with engineering CAD dark background
+    // Scene with engineering CAD dark background (matches sidebar)
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x1F2429);
     sceneRef.current = scene;
@@ -347,27 +347,33 @@ export default function GeometryView() {
       {/* View Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div>
-          <h2 className="text-base font-bold text-[#1B1F23] tracking-tight flex items-center">
-            <Box className="w-4 h-4 text-[#5F6B76] mr-2" /> 3D CAD &amp; ANSYS Data Visualization
+          <h2 
+            className="text-base font-bold tracking-tight flex items-center"
+            style={{ color: 'var(--text)' }}
+          >
+            <Box className="w-4 h-4 mr-2" style={{ color: 'var(--muted)' }} /> 3D CAD &amp; ANSYS Data Visualization
           </h2>
-          <p className="text-xs text-[#5F6B76]">
+          <p className="text-xs" style={{ color: 'var(--muted)' }}>
             C++ streaming parser for ASCII STL surface mesh and ANSYS CSV nodal temperature results.
           </p>
         </div>
 
         {/* Mode Switcher */}
-        <div className="flex items-center space-x-1 bg-[#FFFFFF] p-1 rounded-[4px] border border-[#D5D9DE]">
+        <div 
+          className="flex items-center space-x-1 p-1 rounded-[4px] border"
+          style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)' }}
+        >
           <button
             onClick={() => {
               setActiveMode('stl');
               if (stlData) renderSTL(stlData);
               else loadSampleSTL();
             }}
-            className={`px-3 py-1 rounded-[4px] text-xs font-semibold ${
-              activeMode === 'stl' 
-                ? 'bg-[#E8590C] text-white' 
-                : 'text-[#5F6B76] hover:text-[#1B1F23]'
-            }`}
+            className="px-3 py-1 rounded-[4px] text-xs font-semibold transition-none"
+            style={{
+              backgroundColor: activeMode === 'stl' ? 'var(--accent)' : 'transparent',
+              color: activeMode === 'stl' ? '#FFFFFF' : 'var(--muted)'
+            }}
           >
             ASCII STL Mesh
           </button>
@@ -377,11 +383,11 @@ export default function GeometryView() {
               if (ansysData) renderANSYS(ansysData);
               else loadSampleANSYS();
             }}
-            className={`px-3 py-1 rounded-[4px] text-xs font-semibold ${
-              activeMode === 'ansys' 
-                ? 'bg-[#E8590C] text-white' 
-                : 'text-[#5F6B76] hover:text-[#1B1F23]'
-            }`}
+            className="px-3 py-1 rounded-[4px] text-xs font-semibold transition-none"
+            style={{
+              backgroundColor: activeMode === 'ansys' ? 'var(--accent)' : 'transparent',
+              color: activeMode === 'ansys' ? '#FFFFFF' : 'var(--muted)'
+            }}
           >
             ANSYS Point Cloud (CSV)
           </button>
@@ -390,8 +396,11 @@ export default function GeometryView() {
 
       {/* Error Alert */}
       {error && (
-        <div className="bg-[#FFF5F5] border border-[#C62828] rounded-[4px] p-3 flex items-start space-x-2 text-[#C62828] text-xs font-mono">
-          <AlertTriangle className="w-4 h-4 flex-shrink-0 text-[#C62828] mt-0.5" />
+        <div 
+          className="rounded-[4px] border p-3 flex items-start space-x-2 text-xs font-mono"
+          style={{ backgroundColor: 'var(--card)', borderColor: 'var(--err)', color: 'var(--err)' }}
+        >
+          <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: 'var(--err)' }} />
           <div className="flex-1">
             <div className="font-bold">Validation Error</div>
             <div className="mt-0.5">{error}</div>
@@ -401,34 +410,50 @@ export default function GeometryView() {
 
       {/* Main 3D Canvas Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-        <div className="lg:col-span-3 bg-[#FFFFFF] border border-[#D5D9DE] rounded-[4px] overflow-hidden flex flex-col">
+        <div 
+          className="lg:col-span-3 rounded-[4px] border overflow-hidden flex flex-col"
+          style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)' }}
+        >
           {/* Canvas Toolbar */}
-          <div className="bg-[#F4F5F7] px-3 py-2 border-b border-[#D5D9DE] flex items-center justify-between text-xs text-[#5F6B76]">
+          <div 
+            className="px-3 py-2 border-b flex items-center justify-between text-xs"
+            style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--border)', color: 'var(--muted)' }}
+          >
             <div className="flex items-center space-x-3">
-              <span className="font-mono font-medium text-[#1B1F23] flex items-center text-xs">
-                <span className="w-2 h-2 rounded-[1px] bg-[#2E7D32] mr-1.5"></span>
+              <span 
+                className="font-mono font-medium flex items-center text-xs"
+                style={{ color: 'var(--text)' }}
+              >
+                <span 
+                  className="w-2 h-2 rounded-[1px] mr-1.5"
+                  style={{ backgroundColor: 'var(--ok)' }}
+                ></span>
                 {activeMode === 'stl' ? (stlData?.solid_name || 'STL Mesh') : 'ANSYS Nodal Cloud'}
               </span>
-              <span className="text-[#D5D9DE]">|</span>
-              <span className="text-[11px] text-[#5F6B76] font-mono">Rotate: Left-drag • Pan: Right-drag • Zoom: Scroll</span>
+              <span style={{ color: 'var(--border)' }}>|</span>
+              <span className="text-[11px] font-mono" style={{ color: 'var(--muted)' }}>
+                Rotate: Left-drag • Pan: Right-drag • Zoom: Scroll
+              </span>
             </div>
 
             <div className="flex items-center space-x-1.5">
               {activeMode === 'stl' && (
                 <button
                   onClick={() => setWireframe(!wireframe)}
-                  className={`px-2 py-0.5 rounded-[4px] border text-xs font-mono flex items-center ${
-                    wireframe 
-                      ? 'bg-[#1F2429] text-white border-[#1F2429]' 
-                      : 'border-[#D5D9DE] bg-[#FFFFFF] hover:bg-[#F4F5F7] text-[#1B1F23]'
-                  }`}
+                  className="px-2 py-0.5 rounded-[4px] border text-xs font-mono flex items-center"
+                  style={{
+                    backgroundColor: wireframe ? 'var(--sidebar)' : 'var(--card)',
+                    color: wireframe ? '#FFFFFF' : 'var(--text)',
+                    borderColor: wireframe ? 'var(--sidebar)' : 'var(--border)'
+                  }}
                 >
                   <Layers className="w-3 h-3 mr-1" /> Wireframe
                 </button>
               )}
               <button
                 onClick={fitCameraToModel}
-                className="px-2 py-0.5 rounded-[4px] border border-[#D5D9DE] bg-[#FFFFFF] hover:bg-[#F4F5F7] text-[#1B1F23] text-xs font-mono flex items-center"
+                className="px-2 py-0.5 rounded-[4px] border text-xs font-mono flex items-center"
+                style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--text)' }}
               >
                 <Maximize2 className="w-3 h-3 mr-1" /> Fit View
               </button>
@@ -438,35 +463,51 @@ export default function GeometryView() {
           {/* Three.js Viewport */}
           <div className="relative flex-1 min-h-[460px]" ref={mountRef}>
             {loading && (
-              <div className="absolute inset-0 bg-[#F4F5F7]/80 flex items-center justify-center z-20">
-                <LoadingSpinner text="Parsing in C++ Core & Generating Buffers..." />
+              <div 
+                className="absolute inset-0 flex items-center justify-center z-20"
+                style={{ backgroundColor: 'var(--bg)' }}
+              >
+                <LoadingSpinner text="Parsing in C++ Core &amp; Generating Buffers..." />
               </div>
             )}
 
-            {/* ANSYS Classic Temperature Legend Overlay */}
+            {/* ANSYS Classic Temperature Legend Overlay with explicit degC units */}
             {activeMode === 'ansys' && ansysData && (
-              <div className="absolute top-3 right-3 bg-[#FFFFFF] border border-[#D5D9DE] rounded-[4px] p-2.5 text-xs z-10 w-48 text-[#1B1F23]">
-                <div className="font-bold text-[11px] uppercase tracking-wider text-[#1B1F23] mb-1.5 flex items-center justify-between">
+              <div 
+                className="absolute top-3 right-3 rounded-[4px] border p-2.5 text-xs z-10 w-48"
+                style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--text)' }}
+              >
+                <div className="font-bold text-[11px] uppercase tracking-wider mb-1.5 flex items-center justify-between">
                   <span className="flex items-center">
-                    <Thermometer className="w-3.5 h-3.5 text-[#5F6B76] mr-1" /> Temperature
+                    <Thermometer className="w-3.5 h-3.5 mr-1" style={{ color: 'var(--muted)' }} /> Temperature
                   </span>
-                  <span className="text-[10px] font-mono border border-[#B7791F] text-[#B7791F] px-1 py-0.2 rounded-[2px]">
+                  <span 
+                    className="text-[10px] font-mono border px-1 py-0.2 rounded-[2px]"
+                    style={{ borderColor: 'var(--warn)', color: 'var(--warn)' }}
+                  >
                     SYNTHETIC
                   </span>
                 </div>
                 {/* Classic ANSYS Blue -> Cyan -> Green -> Yellow -> Red Spectrum */}
                 <div 
-                  className="h-3.5 rounded-[2px] border border-[#D5D9DE] mb-1" 
+                  className="h-3.5 rounded-[2px] border mb-1" 
                   style={{
+                    borderColor: 'var(--border)',
                     background: 'linear-gradient(to right, #0000FF, #00FFFF, #00FF00, #FFFF00, #FF0000)'
                   }}
                 ></div>
-                <div className="flex justify-between font-mono text-[10px] text-[#1B1F23]">
+                <div 
+                  className="flex justify-between font-mono text-[10px]"
+                  style={{ color: 'var(--text)' }}
+                >
                   <span>{ansysData.min_temp_C.toFixed(1)} degC</span>
                   <span>{((ansysData.min_temp_C + ansysData.max_temp_C) / 2).toFixed(1)} degC</span>
                   <span>{ansysData.max_temp_C.toFixed(1)} degC</span>
                 </div>
-                <div className="text-[10px] text-[#5F6B76] mt-1 text-center font-mono">
+                <div 
+                  className="text-[10px] mt-1 text-center font-mono"
+                  style={{ color: 'var(--muted)' }}
+                >
                   Scale: Blue (cold) to Red (hot)
                 </div>
               </div>
@@ -474,12 +515,17 @@ export default function GeometryView() {
 
             {/* Selected Node Tooltip */}
             {activeMode === 'ansys' && selectedNode && (
-              <div className="absolute bottom-3 left-3 bg-[#FFFFFF] border border-[#D5D9DE] rounded-[4px] p-2.5 text-xs z-10 font-mono text-[#1B1F23]">
+              <div 
+                className="absolute bottom-3 left-3 rounded-[4px] border p-2.5 text-xs z-10 font-mono"
+                style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--text)' }}
+              >
                 <div className="font-bold text-xs mb-1">Node #{selectedNode.id}</div>
                 <div>X: {selectedNode.x.toFixed(4)} m</div>
                 <div>Y: {selectedNode.y.toFixed(4)} m</div>
                 <div>Z: {selectedNode.z.toFixed(4)} m</div>
-                <div className="font-bold text-[#E8590C] mt-1">Temperature: {selectedNode.temp.toFixed(2)} degC</div>
+                <div className="font-bold mt-1" style={{ color: 'var(--accent)' }}>
+                  Temperature: {selectedNode.temp.toFixed(2)} degC
+                </div>
               </div>
             )}
           </div>
@@ -488,101 +534,127 @@ export default function GeometryView() {
         {/* Sidebar Controls & Metadata */}
         <div className="space-y-4">
           {/* File Upload Actions Card */}
-          <div className="bg-[#FFFFFF] border border-[#D5D9DE] rounded-[4px] p-4">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-[#1B1F23] mb-3 flex items-center font-mono">
-              <Upload className="w-3.5 h-3.5 text-[#5F6B76] mr-1.5" /> Data Import
+          <div 
+            className="rounded-[4px] border p-4"
+            style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)' }}
+          >
+            <h3 
+              className="text-xs font-bold uppercase tracking-wider mb-3 flex items-center font-mono"
+              style={{ color: 'var(--text)' }}
+            >
+              <Upload className="w-3.5 h-3.5 mr-1.5" style={{ color: 'var(--muted)' }} /> Data Import
             </h3>
 
             {activeMode === 'stl' ? (
               <div className="space-y-2.5">
-                <label className="flex flex-col items-center justify-center border border-dashed border-[#D5D9DE] hover:border-[#5F6B76] rounded-[4px] p-3 cursor-pointer bg-[#F4F5F7]">
-                  <Upload className="w-5 h-5 text-[#5F6B76] mb-1.5" />
-                  <span className="text-xs font-semibold text-[#1B1F23]">Upload ASCII STL (.stl)</span>
-                  <span className="text-[10px] text-[#5F6B76] font-mono mt-0.5">Streamed through C++ parser</span>
+                <label 
+                  className="flex flex-col items-center justify-center border border-dashed rounded-[4px] p-3 cursor-pointer"
+                  style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg)' }}
+                >
+                  <Upload className="w-5 h-5 mb-1.5" style={{ color: 'var(--muted)' }} />
+                  <span className="text-xs font-semibold" style={{ color: 'var(--text)' }}>Upload ASCII STL (.stl)</span>
+                  <span className="text-[10px] font-mono mt-0.5" style={{ color: 'var(--muted)' }}>Streamed through C++ parser</span>
                   <input type="file" accept=".stl" onChange={handleSTLFileUpload} className="hidden" />
                 </label>
 
                 <button
                   onClick={loadSampleSTL}
-                  className="w-full flex items-center justify-center px-3 py-1.5 rounded-[4px] bg-[#FFFFFF] hover:bg-[#F4F5F7] text-xs font-semibold text-[#1B1F23] border border-[#D5D9DE]"
+                  className="w-full flex items-center justify-center px-3 py-1.5 rounded-[4px] text-xs font-semibold border"
+                  style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--text)' }}
                 >
-                  <FileText className="w-3.5 h-3.5 text-[#5F6B76] mr-1.5" /> Load Sample Rod STL
+                  <FileText className="w-3.5 h-3.5 mr-1.5" style={{ color: 'var(--muted)' }} /> Load Sample Rod STL
                 </button>
               </div>
             ) : (
               <div className="space-y-2.5">
-                <label className="flex flex-col items-center justify-center border border-dashed border-[#D5D9DE] hover:border-[#5F6B76] rounded-[4px] p-3 cursor-pointer bg-[#F4F5F7]">
-                  <Upload className="w-5 h-5 text-[#5F6B76] mb-1.5" />
-                  <span className="text-xs font-semibold text-[#1B1F23]">Upload ANSYS CSV (.csv)</span>
-                  <span className="text-[10px] text-[#5F6B76] font-mono mt-0.5">node_id,x_m,y_m,z_m,temperature_C</span>
+                <label 
+                  className="flex flex-col items-center justify-center border border-dashed rounded-[4px] p-3 cursor-pointer"
+                  style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg)' }}
+                >
+                  <Upload className="w-5 h-5 mb-1.5" style={{ color: 'var(--muted)' }} />
+                  <span className="text-xs font-semibold" style={{ color: 'var(--text)' }}>Upload ANSYS CSV (.csv)</span>
+                  <span className="text-[10px] font-mono mt-0.5" style={{ color: 'var(--muted)' }}>node_id,x_m,y_m,z_m,temperature_C</span>
                   <input type="file" accept=".csv" onChange={handleCSVFileUpload} className="hidden" />
                 </label>
 
                 <button
                   onClick={loadSampleANSYS}
-                  className="w-full flex items-center justify-center px-3 py-1.5 rounded-[4px] bg-[#FFFFFF] hover:bg-[#F4F5F7] text-xs font-semibold text-[#1B1F23] border border-[#D5D9DE]"
+                  className="w-full flex items-center justify-center px-3 py-1.5 rounded-[4px] text-xs font-semibold border"
+                  style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--text)' }}
                 >
-                  <FileText className="w-3.5 h-3.5 text-[#5F6B76] mr-1.5" /> Load Synthetic ANSYS Dataset
+                  <FileText className="w-3.5 h-3.5 mr-1.5" style={{ color: 'var(--muted)' }} /> Load Synthetic ANSYS Dataset
                 </button>
               </div>
             )}
           </div>
 
           {/* Model Inspection & Metadata Card */}
-          <div className="bg-[#FFFFFF] border border-[#D5D9DE] rounded-[4px] p-4 text-xs space-y-2.5">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-[#1B1F23] flex items-center font-mono">
-              <Info className="w-3.5 h-3.5 text-[#5F6B76] mr-1.5" /> Inspection Metrics
+          <div 
+            className="rounded-[4px] border p-4 text-xs space-y-2.5"
+            style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)' }}
+          >
+            <h3 
+              className="text-xs font-bold uppercase tracking-wider flex items-center font-mono"
+              style={{ color: 'var(--text)' }}
+            >
+              <Info className="w-3.5 h-3.5 mr-1.5" style={{ color: 'var(--muted)' }} /> Inspection Metrics
             </h3>
 
             {activeMode === 'stl' && stlData ? (
               <div className="space-y-1.5 font-mono text-xs">
-                <div className="flex justify-between py-1 border-b border-[#D5D9DE]">
-                  <span className="text-[#5F6B76]">Solid Name</span>
-                  <span className="text-[#1B1F23] font-bold">{stlData.solid_name}</span>
+                <div className="flex justify-between py-1 border-b" style={{ borderColor: 'var(--border)' }}>
+                  <span style={{ color: 'var(--muted)' }}>Solid Name</span>
+                  <span className="font-bold" style={{ color: 'var(--text)' }}>{stlData.solid_name}</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-[#D5D9DE]">
-                  <span className="text-[#5F6B76]">Triangles</span>
-                  <span className="text-[#1B1F23] font-bold">{stlData.triangle_count}</span>
+                <div className="flex justify-between py-1 border-b" style={{ borderColor: 'var(--border)' }}>
+                  <span style={{ color: 'var(--muted)' }}>Triangles</span>
+                  <span className="font-bold" style={{ color: 'var(--text)' }}>{stlData.triangle_count}</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-[#D5D9DE]">
-                  <span className="text-[#5F6B76]">Bounding Diag</span>
-                  <span className="text-[#1B1F23]">{stlData.bbox?.diag_size?.toFixed(3)} m</span>
+                <div className="flex justify-between py-1 border-b" style={{ borderColor: 'var(--border)' }}>
+                  <span style={{ color: 'var(--muted)' }}>Bounding Diag</span>
+                  <span style={{ color: 'var(--text)' }}>{stlData.bbox?.diag_size?.toFixed(3)} m</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-[#D5D9DE]">
-                  <span className="text-[#5F6B76]">Validation</span>
-                  <span className="text-[#2E7D32] font-bold">{stlData.validation_status}</span>
+                <div className="flex justify-between py-1 border-b" style={{ borderColor: 'var(--border)' }}>
+                  <span style={{ color: 'var(--muted)' }}>Validation</span>
+                  <span className="font-bold" style={{ color: 'var(--ok)' }}>{stlData.validation_status}</span>
                 </div>
               </div>
             ) : activeMode === 'ansys' && ansysData ? (
               <div className="space-y-1.5 font-mono text-xs">
-                <div className="flex justify-between py-1 border-b border-[#D5D9DE]">
-                  <span className="text-[#5F6B76]">Nodal Count</span>
-                  <span className="text-[#1B1F23] font-bold">{ansysData.node_count} nodes</span>
+                <div className="flex justify-between py-1 border-b" style={{ borderColor: 'var(--border)' }}>
+                  <span style={{ color: 'var(--muted)' }}>Nodal Count</span>
+                  <span className="font-bold" style={{ color: 'var(--text)' }}>{ansysData.node_count} nodes</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-[#D5D9DE]">
-                  <span className="text-[#5F6B76]">Min Temp</span>
-                  <span className="text-[#1B1F23] font-bold">{ansysData.min_temp_C?.toFixed(2)} degC</span>
+                <div className="flex justify-between py-1 border-b" style={{ borderColor: 'var(--border)' }}>
+                  <span style={{ color: 'var(--muted)' }}>Min Temp</span>
+                  <span className="font-bold" style={{ color: 'var(--text)' }}>{ansysData.min_temp_C?.toFixed(2)} degC</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-[#D5D9DE]">
-                  <span className="text-[#5F6B76]">Max Temp</span>
-                  <span className="text-[#1B1F23] font-bold">{ansysData.max_temp_C?.toFixed(2)} degC</span>
+                <div className="flex justify-between py-1 border-b" style={{ borderColor: 'var(--border)' }}>
+                  <span style={{ color: 'var(--muted)' }}>Max Temp</span>
+                  <span className="font-bold" style={{ color: 'var(--text)' }}>{ansysData.max_temp_C?.toFixed(2)} degC</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-[#D5D9DE]">
-                  <span className="text-[#5F6B76]">Avg Temp</span>
-                  <span className="text-[#1B1F23] font-bold">{ansysData.avg_temp_C?.toFixed(2)} degC</span>
+                <div className="flex justify-between py-1 border-b" style={{ borderColor: 'var(--border)' }}>
+                  <span style={{ color: 'var(--muted)' }}>Avg Temp</span>
+                  <span className="font-bold" style={{ color: 'var(--text)' }}>{ansysData.avg_temp_C?.toFixed(2)} degC</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-[#D5D9DE]">
-                  <span className="text-[#5F6B76]">Provenance</span>
-                  <span className="border border-[#B7791F] text-[#B7791F] px-1 py-0.2 rounded-[2px] text-[10px] font-bold">
+                <div className="flex justify-between py-1 border-b" style={{ borderColor: 'var(--border)' }}>
+                  <span style={{ color: 'var(--muted)' }}>Provenance</span>
+                  <span 
+                    className="border px-1 py-0.2 rounded-[2px] text-[10px] font-bold"
+                    style={{ borderColor: 'var(--warn)', color: 'var(--warn)' }}
+                  >
                     SYNTHETIC
                   </span>
                 </div>
               </div>
             ) : (
-              <p className="text-[#5F6B76] text-xs font-mono">No model loaded yet.</p>
+              <p className="text-xs font-mono" style={{ color: 'var(--muted)' }}>No model loaded yet.</p>
             )}
 
-            <div className="pt-2 text-[10px] text-[#5F6B76] leading-relaxed border-t border-[#D5D9DE] font-mono">
+            <div 
+              className="pt-2 text-[10px] leading-relaxed border-t font-mono"
+              style={{ borderColor: 'var(--border)', color: 'var(--muted)' }}
+            >
               Parser verified in C++17: supports &gt; 250,000 STL facets (~25 MB) and 500,000 ANSYS CSV lines without UI freezing.
             </div>
           </div>
