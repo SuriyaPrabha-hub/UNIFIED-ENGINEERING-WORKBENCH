@@ -9,7 +9,8 @@ import {
   HelpCircle,
   FileSpreadsheet,
   Settings,
-  Layers
+  Layers,
+  AlertCircle
 } from 'lucide-react';
 import { 
   LineChart, 
@@ -19,9 +20,7 @@ import {
   CartesianGrid, 
   Tooltip, 
   Legend, 
-  ResponsiveContainer,
-  ScatterChart,
-  Scatter
+  ResponsiveContainer
 } from 'recharts';
 import { api } from '../api/client';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -38,12 +37,13 @@ export default function ThermalView() {
   });
 
   const [loading, setLoading] = useState(false);
+  const [convLoading, setConvLoading] = useState(false);
   const [error, setError] = useState(null);
   const [solution, setSolution] = useState(null);
   const [convergenceData, setConvergenceData] = useState(null);
-  const [activeSubTab, setActiveSubTab] = useState('solution'); // 'solution', 'convergence', 'table'
+  const [activeSubTab, setActiveSubTab] = useState('solution');
 
-  // Run single FEA solve on mount
+  // Auto-solve on mount
   useEffect(() => {
     handleSolve();
     handleConvergenceStudy();
@@ -63,11 +63,14 @@ export default function ThermalView() {
   };
 
   const handleConvergenceStudy = async () => {
+    setConvLoading(true);
     try {
       const res = await api.getConvergence(params);
       setConvergenceData(res);
     } catch (err) {
       console.error('Convergence study error:', err);
+    } finally {
+      setConvLoading(false);
     }
   };
 
@@ -87,7 +90,7 @@ export default function ThermalView() {
     }
   };
 
-  // Prepare chart data for Temperature vs X
+  // Chart data: nodal temperature vs x
   const chartData = [];
   if (solution && solution.nodes) {
     solution.nodes.forEach((n) => {
@@ -119,7 +122,6 @@ export default function ThermalView() {
     convergenceData.N_values.forEach((n, idx) => {
       const h = convergenceData.h_values[idx];
       const err = convergenceData.max_errors[idx];
-      // Theoretical error: q*h^2 / (8*k) = 125 * h^2
       const theory = (params.q / (8.0 * params.k)) * (h * h);
       convPlotData.push({
         N: n,
@@ -139,7 +141,7 @@ export default function ThermalView() {
             <Flame className="w-6 h-6 text-orange-500 mr-2.5" /> 1D Mechanical Thermal FEA Solver
           </h2>
           <p className="text-sm text-gray-400">
-            Steady-state Galerkin finite element formulation with volumetric heat generation & exact analytical convergence verification.
+            Steady-state Galerkin FEM with volumetric heat generation &amp; exact analytical convergence verification.
           </p>
         </div>
 
@@ -159,6 +161,19 @@ export default function ThermalView() {
           </button>
         </div>
       </div>
+
+      {/* Error Banner */}
+      {error && !loading && (
+        <div className="bg-red-900/30 border border-red-500/40 rounded-xl p-4 flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-red-400 mt-0.5 flex-shrink-0" />
+          <div>
+            <div className="text-sm font-semibold text-red-300">{error}</div>
+            <div className="mt-1 text-xs text-red-400">
+              Make sure the C++ backend is running. Run <code className="font-mono bg-red-900/40 px-1 rounded">Launch.bat</code> first, then click "Run FEA Solve".
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main Grid: Parameters + Output */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -280,16 +295,23 @@ export default function ThermalView() {
               <div className="text-gray-400 text-[11px]">Active Mesh Metrics:</div>
               <div className="flex justify-between">
                 <span className="text-gray-400">Element h:</span>
-                <span className="text-white font-bold">{solution.element_length_h.toFixed(4)} m</span>
+                <span className="text-white font-bold">{solution.element_length_h?.toFixed(4)} m</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-400">Nodes:</span>
-                <span className="text-blue-400 font-bold">{solution.node_x_m.length}</span>
+                <span className="text-blue-400 font-bold">{solution.nodes?.length ?? 0}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-400">Max Midpoint Error:</span>
-                <span className="text-amber-400 font-bold">{solution.max_midpoint_error_C.toFixed(5)} °C</span>
+                <span className="text-amber-400 font-bold">{solution.max_midpoint_error_C?.toFixed(5)} °C</span>
               </div>
+            </div>
+          )}
+
+          {loading && (
+            <div className="flex items-center gap-2 text-xs text-blue-400 mt-2">
+              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+              <span>Solving on C++ backend…</span>
             </div>
           )}
         </div>
@@ -317,7 +339,7 @@ export default function ThermalView() {
                     : 'text-gray-400 hover:text-white'
                 }`}
               >
-                Mesh Convergence Study (N=10, 20, 40, 80)
+                Mesh Convergence (N=10,20,40,80)
               </button>
               <button
                 onClick={() => setActiveSubTab('table')}
@@ -327,7 +349,7 @@ export default function ThermalView() {
                     : 'text-gray-400 hover:text-white'
                 }`}
               >
-                Nodal & Midpoint Data Table
+                Nodal &amp; Midpoint Table
               </button>
             </div>
           </div>
@@ -337,54 +359,66 @@ export default function ThermalView() {
             <div className="bg-[#111827] border border-[#1F2937] rounded-xl p-5 shadow-sm space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-bold text-white flex items-center">
-                  <span>Temperature Profile along Rod Axis x ∈ [0, {params.L}] m</span>
+                  <span>Temperature Profile along Rod Axis x [0, {params.L}] m</span>
                 </h3>
                 <span className="text-xs text-emerald-400 font-mono bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
                   Nodal Error &lt; 1e-12 °C (Superconvergent)
                 </span>
               </div>
 
-              <div className="h-80 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData} margin={{ top: 10, right: 30, left: 10, bottom: 20 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
-                    <XAxis 
-                      dataKey="x" 
-                      stroke="#9CA3AF" 
-                      label={{ value: 'Position along rod x (meters)', position: 'insideBottom', offset: -10, fill: '#9CA3AF' }}
-                    />
-                    <YAxis 
-                      stroke="#9CA3AF" 
-                      label={{ value: 'Temperature (°C)', angle: -90, position: 'insideLeft', fill: '#9CA3AF' }}
-                    />
-                    <Tooltip 
-                      contentStyle={{ backgroundColor: '#111827', borderColor: '#374151', borderRadius: '0.5rem', fontSize: '12px' }}
-                    />
-                    <Legend verticalAlign="top" wrapperStyle={{ paddingBottom: '10px' }} />
-                    <Line 
-                      type="monotone" 
-                      dataKey="T_fe" 
-                      name="FEA Solution (Linear Elements)" 
-                      stroke="#3B82F6" 
-                      strokeWidth={2.5} 
-                      dot={{ r: 4, fill: '#3B82F6' }} 
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="T_exact" 
-                      name="Exact Analytical T_exact(x)" 
-                      stroke="#10B981" 
-                      strokeWidth={1.5} 
-                      strokeDasharray="4 4" 
-                      dot={false} 
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
+              {loading ? (
+                <div className="h-80 flex items-center justify-center">
+                  <LoadingSpinner />
+                  <span className="ml-3 text-sm text-gray-400">Running FEA solver…</span>
+                </div>
+              ) : chartData.length === 0 ? (
+                <div className="h-80 flex flex-col items-center justify-center text-gray-500 text-sm gap-3">
+                  <Flame className="w-10 h-10 text-gray-700" />
+                  <span>No solution data. Click <strong className="text-blue-400">Run FEA Solve</strong> to compute.</span>
+                </div>
+              ) : (
+                <div className="h-80 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={chartData} margin={{ top: 10, right: 30, left: 10, bottom: 20 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
+                      <XAxis 
+                        dataKey="x" 
+                        stroke="#9CA3AF" 
+                        label={{ value: 'Position along rod x (meters)', position: 'insideBottom', offset: -10, fill: '#9CA3AF' }}
+                      />
+                      <YAxis 
+                        stroke="#9CA3AF" 
+                        label={{ value: 'Temperature (°C)', angle: -90, position: 'insideLeft', fill: '#9CA3AF' }}
+                      />
+                      <Tooltip 
+                        contentStyle={{ backgroundColor: '#111827', borderColor: '#374151', borderRadius: '0.5rem', fontSize: '12px' }}
+                      />
+                      <Legend verticalAlign="top" wrapperStyle={{ paddingBottom: '10px' }} />
+                      <Line 
+                        type="monotone" 
+                        dataKey="T_fe" 
+                        name="FEA Solution (Linear Elements)" 
+                        stroke="#3B82F6" 
+                        strokeWidth={2.5} 
+                        dot={{ r: 4, fill: '#3B82F6' }} 
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="T_exact" 
+                        name="Exact Analytical T_exact(x)" 
+                        stroke="#10B981" 
+                        strokeWidth={1.5} 
+                        strokeDasharray="4 4" 
+                        dot={false} 
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
 
               <div className="p-3 bg-[#161F30] rounded-lg border border-[#1F2937] text-xs text-gray-300 leading-relaxed font-sans">
                 <strong className="text-white">Physical Interpretation:</strong> With uniform internal heat generation <span className="font-mono text-orange-400">q = 10,000 W/m³</span>, 
-                the temperature profile displays a parabolic interior peak (max temperature ~188°C around x ≈ 0.42 m) exceeding both boundary values (T(0)=100°C and T(L)=20°C). 
+                the temperature profile displays a parabolic interior peak (max temperature ~188°C around x=0.42 m) exceeding both boundary values (T(0)=100°C and T(L)=20°C). 
                 Heat flows outward from the peak towards both ends in accordance with Fourier's conduction law.
               </div>
             </div>
@@ -396,60 +430,73 @@ export default function ThermalView() {
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-bold text-white flex items-center">
                   <TrendingDown className="w-4 h-4 text-emerald-400 mr-2" /> 
-                  Mesh Convergence Analysis: Max Midpoint Absolute Error vs Element Size (h)
+                  Mesh Convergence Analysis: Max Midpoint Absolute Error vs h
                 </h3>
                 <span className="text-xs text-emerald-400 font-mono bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
                   O(h²) Quadratic Convergence Verified
                 </span>
               </div>
 
-              {/* Convergence Table */}
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs font-mono">
-                  <thead className="bg-[#161F30] text-gray-400 border-b border-[#1F2937]">
-                    <tr>
-                      <th className="py-2.5 px-3">Elements N</th>
-                      <th className="py-2.5 px-3">Element Size h (m)</th>
-                      <th className="py-2.5 px-3">Max Midpoint Error (°C)</th>
-                      <th className="py-2.5 px-3">Theoretical Error [qh²/(8k)]</th>
-                      <th className="py-2.5 px-3">Observed Reduction Ratio</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#1F2937] text-gray-200">
-                    {convPlotData.map((row, i) => {
-                      const prev = i > 0 ? convPlotData[i - 1].max_error : null;
-                      const ratio = prev ? (prev / row.max_error).toFixed(3) : '-';
-                      return (
-                        <tr key={row.N} className="hover:bg-[#161F30]/50">
-                          <td className="py-2.5 px-3 font-bold text-blue-400">N = {row.N}</td>
-                          <td className="py-2.5 px-3">{row.h} m</td>
-                          <td className="py-2.5 px-3 font-bold text-amber-400">{row.max_error} °C</td>
-                          <td className="py-2.5 px-3 text-emerald-400">{row.theoretical_err} °C</td>
-                          <td className="py-2.5 px-3 font-bold text-white">{ratio}x {ratio !== '-' ? '(~4.00x O(h²))' : ''}</td>
+              {convLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <LoadingSpinner />
+                  <span className="ml-3 text-sm text-gray-400">Computing convergence study for N=10,20,40,80…</span>
+                </div>
+              ) : convPlotData.length === 0 ? (
+                <div className="flex items-center justify-center py-8 text-gray-500 text-sm">
+                  No convergence data. Click <strong className="text-blue-400 mx-1">Run FEA Solve</strong>.
+                </div>
+              ) : (
+                <>
+                  {/* Convergence Table */}
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs font-mono">
+                      <thead className="bg-[#161F30] text-gray-400 border-b border-[#1F2937]">
+                        <tr>
+                          <th className="py-2.5 px-3">Elements N</th>
+                          <th className="py-2.5 px-3">Element Size h (m)</th>
+                          <th className="py-2.5 px-3">Max Midpoint Error (°C)</th>
+                          <th className="py-2.5 px-3">Theoretical Error [qh²/(8k)]</th>
+                          <th className="py-2.5 px-3">Observed Reduction Ratio</th>
                         </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+                      </thead>
+                      <tbody className="divide-y divide-[#1F2937] text-gray-200">
+                        {convPlotData.map((row, i) => {
+                          const prev = i > 0 ? convPlotData[i - 1].max_error : null;
+                          const ratio = prev ? (prev / row.max_error).toFixed(3) : '-';
+                          return (
+                            <tr key={row.N} className="hover:bg-[#161F30]/50">
+                              <td className="py-2.5 px-3 font-bold text-blue-400">N = {row.N}</td>
+                              <td className="py-2.5 px-3">{row.h} m</td>
+                              <td className="py-2.5 px-3 font-bold text-amber-400">{row.max_error} °C</td>
+                              <td className="py-2.5 px-3 text-emerald-400">{row.theoretical_err} °C</td>
+                              <td className="py-2.5 px-3 font-bold text-white">{ratio}x {ratio !== '-' ? '(~4.00x, O(h²))' : ''}</td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
 
-              {/* Convergence Chart */}
-              <div className="h-64 w-full pt-4">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={convPlotData} margin={{ top: 10, right: 30, left: 10, bottom: 20 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
-                    <XAxis dataKey="N" stroke="#9CA3AF" label={{ value: 'Number of Elements N', position: 'insideBottom', offset: -10, fill: '#9CA3AF' }} />
-                    <YAxis stroke="#9CA3AF" label={{ value: 'Max Midpoint Error (°C)', angle: -90, position: 'insideLeft', fill: '#9CA3AF' }} />
-                    <Tooltip contentStyle={{ backgroundColor: '#111827', borderColor: '#374151', borderRadius: '0.5rem', fontSize: '12px' }} />
-                    <Legend verticalAlign="top" wrapperStyle={{ paddingBottom: '10px' }} />
-                    <Line type="monotone" dataKey="max_error" name="Computed FEA Midpoint Error" stroke="#F59E0B" strokeWidth={2.5} dot={{ r: 5, fill: '#F59E0B' }} />
-                    <Line type="monotone" dataKey="theoretical_err" name="Theoretical Quadratic Rate O(h²)" stroke="#10B981" strokeWidth={1.5} strokeDasharray="4 4" dot={false} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
+                  {/* Convergence Chart */}
+                  <div className="h-64 w-full pt-4">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={convPlotData} margin={{ top: 10, right: 30, left: 10, bottom: 20 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
+                        <XAxis dataKey="N" stroke="#9CA3AF" label={{ value: 'Number of Elements N', position: 'insideBottom', offset: -10, fill: '#9CA3AF' }} />
+                        <YAxis stroke="#9CA3AF" label={{ value: 'Max Midpoint Error (°C)', angle: -90, position: 'insideLeft', fill: '#9CA3AF' }} />
+                        <Tooltip contentStyle={{ backgroundColor: '#111827', borderColor: '#374151', borderRadius: '0.5rem', fontSize: '12px' }} />
+                        <Legend verticalAlign="top" wrapperStyle={{ paddingBottom: '10px' }} />
+                        <Line type="monotone" dataKey="max_error" name="Computed FEA Midpoint Error" stroke="#F59E0B" strokeWidth={2.5} dot={{ r: 5, fill: '#F59E0B' }} />
+                        <Line type="monotone" dataKey="theoretical_err" name="Theoretical Quadratic Rate O(h²)" stroke="#10B981" strokeWidth={1.5} strokeDasharray="4 4" dot={false} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </>
+              )}
 
               <div className="p-3 bg-[#161F30] rounded-lg border border-[#1F2937] text-xs text-gray-300 leading-relaxed font-sans">
-                <strong className="text-white">Interdisciplinary Learning & Debugging Insight:</strong> In 1D linear FEA with constant properties and uniform heat generation, 
+                <strong className="text-white">Interdisciplinary Learning &amp; Debugging Insight:</strong> In 1D linear FEA with constant properties and uniform heat generation, 
                 the nodal solutions match the analytical solution to machine precision (&lt; 1e-12 °C) due to Green's function exactness at nodes (nodal superconvergence). 
                 If one only checked errors at nodes, mesh convergence would be unobservable! By evaluating errors at element midpoints via FE interpolation (T_e + T_e+1)/2, 
                 the true piecewise-linear approximation error q·h²/(8k) is revealed, proving exact 4x error reduction whenever element size h is halved.
@@ -458,47 +505,55 @@ export default function ThermalView() {
           )}
 
           {/* Sub-tab 3: Nodal Table */}
-          {activeSubTab === 'table' && solution && (
+          {activeSubTab === 'table' && (
             <div className="bg-[#111827] border border-[#1F2937] rounded-xl p-5 shadow-sm space-y-4">
               <h3 className="text-sm font-bold text-white">
-                Detailed Nodal & Element Midpoint Numerical Output (N = {params.num_elements})
+                Detailed Nodal &amp; Element Midpoint Numerical Output (N = {params.num_elements})
               </h3>
-              <div className="max-h-96 overflow-y-auto">
-                <table className="w-full text-left text-xs font-mono">
-                  <thead className="bg-[#161F30] text-gray-400 sticky top-0 border-b border-[#1F2937]">
-                    <tr>
-                      <th className="py-2 px-3">Type</th>
-                      <th className="py-2 px-3">Index</th>
-                      <th className="py-2 px-3">Position x (m)</th>
-                      <th className="py-2 px-3">FEA Temp (°C)</th>
-                      <th className="py-2 px-3">Exact Temp (°C)</th>
-                      <th className="py-2 px-3">Abs Error (°C)</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#1F2937] text-gray-300">
-                    {solution.nodes.map((n) => (
-                      <tr key={`n-${n.node_id}`} className="hover:bg-[#161F30]/40">
-                        <td className="py-1.5 px-3 text-blue-400 font-semibold">Node</td>
-                        <td className="py-1.5 px-3">#{n.node_id}</td>
-                        <td className="py-1.5 px-3">{n.x_m.toFixed(4)}</td>
-                        <td className="py-1.5 px-3 font-bold text-white">{n.T_fe_C.toFixed(4)}</td>
-                        <td className="py-1.5 px-3">{n.T_exact_C.toFixed(4)}</td>
-                        <td className="py-1.5 px-3 text-emerald-400 font-mono">{n.abs_error_C.toExponential(4)}</td>
+
+              {!solution ? (
+                <div className="flex flex-col items-center justify-center py-8 text-gray-500 text-sm gap-3">
+                  <Layers className="w-10 h-10 text-gray-700" />
+                  <span>No data yet. Click <strong className="text-blue-400">Run FEA Solve</strong> first.</span>
+                </div>
+              ) : (
+                <div className="max-h-96 overflow-y-auto">
+                  <table className="w-full text-left text-xs font-mono">
+                    <thead className="bg-[#161F30] text-gray-400 sticky top-0 border-b border-[#1F2937]">
+                      <tr>
+                        <th className="py-2 px-3">Type</th>
+                        <th className="py-2 px-3">Index</th>
+                        <th className="py-2 px-3">Position x (m)</th>
+                        <th className="py-2 px-3">FEA Temp (°C)</th>
+                        <th className="py-2 px-3">Exact Temp (°C)</th>
+                        <th className="py-2 px-3">Abs Error (°C)</th>
                       </tr>
-                    ))}
-                    {solution.midpoints.map((m) => (
-                      <tr key={`m-${m.element_id}`} className="hover:bg-[#161F30]/40 bg-amber-500/5">
-                        <td className="py-1.5 px-3 text-amber-400 font-semibold">Midpoint</td>
-                        <td className="py-1.5 px-3">Elem #{m.element_id}</td>
-                        <td className="py-1.5 px-3">{m.x_mid_m.toFixed(4)}</td>
-                        <td className="py-1.5 px-3 font-bold text-white">{m.T_fe_C.toFixed(4)}</td>
-                        <td className="py-1.5 px-3">{m.T_exact_C.toFixed(4)}</td>
-                        <td className="py-1.5 px-3 text-amber-400 font-mono">{m.abs_error_C.toFixed(6)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody className="divide-y divide-[#1F2937] text-gray-300">
+                      {solution.nodes.map((n) => (
+                        <tr key={`n-${n.node_id}`} className="hover:bg-[#161F30]/40">
+                          <td className="py-1.5 px-3 text-blue-400 font-semibold">Node</td>
+                          <td className="py-1.5 px-3">#{n.node_id}</td>
+                          <td className="py-1.5 px-3">{n.x_m.toFixed(4)}</td>
+                          <td className="py-1.5 px-3 font-bold text-white">{n.T_fe_C.toFixed(4)}</td>
+                          <td className="py-1.5 px-3">{n.T_exact_C.toFixed(4)}</td>
+                          <td className="py-1.5 px-3 text-emerald-400 font-mono">{n.abs_error_C.toExponential(4)}</td>
+                        </tr>
+                      ))}
+                      {solution.midpoints.map((m) => (
+                        <tr key={`m-${m.element_id}`} className="hover:bg-[#161F30]/40 bg-amber-500/5">
+                          <td className="py-1.5 px-3 text-amber-400 font-semibold">Midpoint</td>
+                          <td className="py-1.5 px-3">Elem #{m.element_id}</td>
+                          <td className="py-1.5 px-3">{m.x_mid_m.toFixed(4)}</td>
+                          <td className="py-1.5 px-3 font-bold text-white">{m.T_fe_C.toFixed(4)}</td>
+                          <td className="py-1.5 px-3">{m.T_exact_C.toFixed(4)}</td>
+                          <td className="py-1.5 px-3 text-amber-400 font-mono">{m.abs_error_C.toFixed(6)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           )}
         </div>
