@@ -25,7 +25,11 @@ static void setCorsHeaders(httplib::Response& res) {
 int main(int argc, char* argv[]) {
     int port = 8080;
     if (argc > 1) {
-        port = std::stoi(argv[1]);
+        try {
+            port = std::stoi(argv[1]);
+        } catch (...) {
+            port = 8080;
+        }
     }
 
     httplib::Server svr;
@@ -316,15 +320,25 @@ int main(int argc, char* argv[]) {
     });
 
     // 11. Static files from frontend/dist if present
-    svr.set_mount_point("/", "./frontend/dist");
+    if (std::ifstream("frontend/dist/index.html").good()) {
+        svr.set_mount_point("/", "./frontend/dist");
+    } else if (std::ifstream("../frontend/dist/index.html").good()) {
+        svr.set_mount_point("/", "../frontend/dist");
+    } else if (std::ifstream("./dist/index.html").good()) {
+        svr.set_mount_point("/", "./dist");
+    }
 
     std::cout << "========================================================\n";
     std::cout << "  UNIFIED ENGINEERING WORKBENCH C++ BACKEND SERVER      \n";
     std::cout << "  Listening on: http://127.0.0.1:" << port << "\n";
     std::cout << "  C++17 Numerical Core | Active Hardware Concurrency: " 
               << std::thread::hardware_concurrency() << "\n";
-    std::cout << "========================================================\n";
+    std::cout << "========================================================\n" << std::flush;
 
-    svr.listen("127.0.0.1", port);
+    bool ok = svr.listen("127.0.0.1", port);
+    if (!ok) {
+        std::cerr << "SERVER FAILED TO BIND TO PORT " << port << std::endl << std::flush;
+        return 1;
+    }
     return 0;
 }
