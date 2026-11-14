@@ -1,0 +1,17 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch Unified Workbench (Standalone Packaged)",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "${workspaceFolder}/Launch.bat"
+    },
+    {
+      "name": "Run C++ Verification Tests",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "${workspaceFolder}/backend/tests/run_tests.exe"
+    }
+  ]
+}
