@@ -1,0 +1,10 @@
+# Unified Engineering Workbench - Performance Benchmark Results
+# Compiler: GCC 16.2.0, Flags: -O3 -march=native -DNDEBUG
+# Hardware Concurrency: 8 logical cores
+# Workload: 200 independent FEA solves (N=40 elements)
+# Numerical Agreement Max Diff: 0.0000e+00 C (Pass=YES)
+workers,rep1_ms,rep2_ms,rep3_ms,rep4_ms,rep5_ms,median_ms,speedup,efficiency
+1,1.0941e+01,1.2733e+01,8.3443e+00,8.3459e+00,7.9672e+00,8.3459e+00,1.0000e+00,1.0000e+00
+2,8.3526e+00,5.8929e+00,6.5130e+00,6.0761e+00,4.3547e+01,6.5130e+00,1.2814e+00,6.4071e-01
+3,8.4842e+01,4.5640e+00,6.7453e+00,5.8865e+00,6.6518e+00,6.6518e+00,1.2547e+00,4.1823e-01
+4,7.7615e+00,3.8339e+00,4.2322e+00,4.7326e+00,3.7726e+00,4.2322e+00,1.9720e+00,4.9300e-01
