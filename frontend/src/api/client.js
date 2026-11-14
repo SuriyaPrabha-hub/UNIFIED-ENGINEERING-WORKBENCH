@@ -11,23 +11,29 @@ async function request(endpoint, options = {}) {
       }
     });
 
+    // Read body ONCE as text, then parse — avoids "body stream already read" error
+    const rawText = await res.text();
+
     if (!res.ok) {
       let errorMsg = `HTTP Error ${res.status}: ${res.statusText}`;
       try {
-        const errorJson = await res.json();
+        const errorJson = JSON.parse(rawText);
         if (errorJson.error) errorMsg = errorJson.error;
       } catch (_) {
-        const text = await res.text();
-        if (text) errorMsg = text;
+        if (rawText) errorMsg = rawText;
       }
       throw new Error(errorMsg);
     }
 
     const contentType = res.headers.get('content-type') || '';
     if (contentType.includes('application/json')) {
-      return await res.json();
+      try {
+        return JSON.parse(rawText);
+      } catch (_) {
+        throw new Error(`Invalid JSON response from ${endpoint}: ${rawText.slice(0, 120)}`);
+      }
     }
-    return await res.text();
+    return rawText;
   } catch (err) {
     console.error(`API Request Failed [${endpoint}]:`, err);
     throw err;
@@ -71,8 +77,11 @@ export const api = {
   }),
   getSampleSTL: () => request('/geometry/sample-stl'),
   getSampleAnsysCSV: () => request('/geometry/sample-ansys-csv'),
-  getSampleLionSTL: () => request('/geometry/sample-lion-stl'),
-  getSampleLionAnsysCSV: () => request('/geometry/sample-lion-ansys-csv'),
+  getSamplePowerUnitSTL: () => request('/geometry/sample-powerunit-stl'),
+  getSamplePowerUnitAnsysCSV: () => request('/geometry/sample-powerunit-ansys-csv'),
+  // Backward compatibility aliases
+  getSampleLionSTL: () => request('/geometry/sample-powerunit-stl'),
+  getSampleLionAnsysCSV: () => request('/geometry/sample-powerunit-ansys-csv'),
 
   // Performance Benchmark
   runBenchmark: (config) => request('/benchmark/run', {

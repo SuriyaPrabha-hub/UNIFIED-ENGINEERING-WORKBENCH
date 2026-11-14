@@ -74,9 +74,13 @@ public:
     static std::string generateSyntheticSampleSTL();
     static std::string generateSyntheticSampleAnsysCSV();
 
-    // Project LION - Biomimetic Quadruped Robot (Bio-Thermal FEA Showcase)
-    static std::string generateProjectLionSTL();
-    static std::string generateProjectLionAnsysCSV();
+    // Formula-E Electric Hypercar Power Unit (SiC Inverter + Axial-Flux Traction Motor FEA Showcase)
+    static std::string generateFormulaEPowerUnitSTL();
+    static std::string generateFormulaEAnsysCSV();
+
+    // Compatibility aliases
+    static std::string generateProjectLionSTL() { return generateFormulaEPowerUnitSTL(); }
+    static std::string generateProjectLionAnsysCSV() { return generateFormulaEAnsysCSV(); }
 };
 
 } // namespace workbench

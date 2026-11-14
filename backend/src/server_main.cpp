@@ -160,7 +160,7 @@ int main(int argc, char* argv[]) {
         }
     });
 
-    // 7. Geometry - Sample files (Benchmark Rod & Project LION)
+    // 7. Geometry - Sample files (Benchmark Rod & Formula-E Power Unit)
     svr.Get("/api/geometry/sample-stl", [](const httplib::Request&, httplib::Response& res) {
         setCorsHeaders(res);
         std::string sample = GeometryParser::generateSyntheticSampleSTL();
@@ -175,19 +175,24 @@ int main(int argc, char* argv[]) {
         res.set_content(cloud.toJson().dump(), "application/json");
     });
 
-    svr.Get("/api/geometry/sample-lion-stl", [](const httplib::Request&, httplib::Response& res) {
+    // Formula-E Electric Hypercar Power Unit (SiC Inverter + Axial-Flux Motor)
+    auto serve_powerunit_stl = [](const httplib::Request&, httplib::Response& res) {
         setCorsHeaders(res);
-        std::string sample = GeometryParser::generateProjectLionSTL();
+        std::string sample = GeometryParser::generateFormulaEPowerUnitSTL();
         STLGeometry geom = GeometryParser::parseSTL(sample);
         res.set_content(geom.toJson().dump(), "application/json");
-    });
+    };
+    svr.Get("/api/geometry/sample-powerunit-stl", serve_powerunit_stl);
+    svr.Get("/api/geometry/sample-lion-stl", serve_powerunit_stl); // Backward compatibility alias
 
-    svr.Get("/api/geometry/sample-lion-ansys-csv", [](const httplib::Request&, httplib::Response& res) {
+    auto serve_powerunit_csv = [](const httplib::Request&, httplib::Response& res) {
         setCorsHeaders(res);
-        std::string sample = GeometryParser::generateProjectLionAnsysCSV();
+        std::string sample = GeometryParser::generateFormulaEAnsysCSV();
         AnsysPointCloud cloud = GeometryParser::parseAnsysCSV(sample);
         res.set_content(cloud.toJson().dump(), "application/json");
-    });
+    };
+    svr.Get("/api/geometry/sample-powerunit-ansys-csv", serve_powerunit_csv);
+    svr.Get("/api/geometry/sample-lion-ansys-csv", serve_powerunit_csv); // Backward compatibility alias
 
     // 8. Performance Benchmark Suite
     svr.Post("/api/benchmark/run", [](const httplib::Request& req, httplib::Response& res) {

@@ -91,13 +91,13 @@ void testGeometryParsers() {
     assert(bin_geom.validation_status == "VALID_BINARY_STL");
     std::cout << "  Binary STL Parser: Successfully decoded IEEE 754 binary triangles -> PASSED" << std::endl;
 
-    // Test 2.3: Project LION Biomimetic Quadruped Model
-    std::string lion_stl = GeometryParser::generateProjectLionSTL();
-    STLGeometry lion_geom = GeometryParser::parseSTL(lion_stl);
-    assert(lion_geom.triangle_count > 200);
-    assert(lion_geom.bbox.diag_size > 0.5); // Lion quadruped dimensions
-    std::cout << "  Project LION Biomimetic STL: " << lion_geom.triangle_count 
-              << " triangles, BBox Diag: " << lion_geom.bbox.diag_size << " m -> PASSED" << std::endl;
+    // Test 2.3: Formula-E Electric Hypercar Power Unit STL (SiC Inverter + Axial-Flux Motor)
+    std::string pe_stl = GeometryParser::generateFormulaEPowerUnitSTL();
+    STLGeometry pe_geom = GeometryParser::parseSTL(pe_stl);
+    assert(pe_geom.triangle_count > 200);
+    assert(pe_geom.bbox.diag_size > 0.5); // Powertrain package dimensions
+    std::cout << "  Formula-E Hypercar Power Unit STL: " << pe_geom.triangle_count 
+              << " triangles, BBox Diag: " << pe_geom.bbox.diag_size << " m -> PASSED" << std::endl;
 
     // Test 2.4: Standard ANSYS CSV parsing
     std::string sample_csv = GeometryParser::generateSyntheticSampleAnsysCSV();
@@ -119,14 +119,14 @@ void testGeometryParsers() {
     assert(std::abs(custom_cloud.nodes[1].x_m - 0.1) < 1e-4); // 100 mm auto-scaled to 0.1 m
     std::cout << "  Universal CSV (Semicolon + mm auto-scaling): 3 nodes converted to SI meters -> PASSED" << std::endl;
 
-    // Test 2.6: Project LION ANSYS Nodal Distribution
-    std::string lion_csv = GeometryParser::generateProjectLionAnsysCSV();
-    AnsysPointCloud lion_cloud = GeometryParser::parseAnsysCSV(lion_csv);
-    assert(lion_cloud.node_count > 100);
-    assert(lion_cloud.max_temp_C > 88.0); // Hot BLDC joint motors
-    assert(lion_cloud.min_temp_C < 28.0); // Ambient ground paws
-    std::cout << "  Project LION ANSYS FEA Cloud: " << lion_cloud.node_count << " nodes (Range: " 
-              << lion_cloud.min_temp_C << " C to " << lion_cloud.max_temp_C << " C) -> PASSED" << std::endl;
+    // Test 2.6: Formula-E Launch Mode ANSYS FEA Cloud (SiC Junctions + Stator Windings)
+    std::string pe_csv = GeometryParser::generateFormulaEAnsysCSV();
+    AnsysPointCloud pe_cloud = GeometryParser::parseAnsysCSV(pe_csv);
+    assert(pe_cloud.node_count > 100);
+    assert(pe_cloud.max_temp_C > 115.0); // Extreme SiC MOSFET launch junction hotspot
+    assert(pe_cloud.min_temp_C < 28.0);  // Ambient chassis mounts
+    std::cout << "  Formula-E Inverter/Motor FEA Cloud: " << pe_cloud.node_count << " nodes (Range: " 
+              << pe_cloud.min_temp_C << " C to " << pe_cloud.max_temp_C << " C) -> PASSED" << std::endl;
 
     // Negative tests: Empty file rejection
     bool caught_empty_stl = false;

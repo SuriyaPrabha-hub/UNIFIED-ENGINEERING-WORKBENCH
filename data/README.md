@@ -30,31 +30,36 @@
 
 ---
 
-## 3. Project LION Biomimetic Model: `project_lion_quadruped.stl`
-- **File Name:** `project_lion_quadruped.stl`
-- **Provenance:** Biomimetic Quadruped Exploration Robot developed for PASS Science Works R&D internship showcase.
+## 3. Formula-E Hypercar Powertrain STL: `formula_e_hypercar_power_unit.stl`
+- **File Name:** `formula_e_hypercar_power_unit.stl`
+- **Provenance:** Electric Hypercar Powertrain CAD assembly developed for PASS Science Works R&D internship engineering showcase.
 - **Components:**
-  - Carbon-fiber central monocoque torso and aerodynamic chest cowl ($L \approx 0.65\text{ m}, W \approx 0.24\text{ m}, H \approx 0.16\text{ m}$)
-  - Top longitudinal cooling spine heat exchanger (airflow-assisted dissipation)
-  - Biomimetic cranium and vision/LiDAR snout with antenna pods
-  - 4 articulated running legs in dynamic galloping posture (hip & knee actuators, titanium struts, shock-absorbing paws)
-  - Dynamic inertial stabilizer tail boom
-- **Format:** Universal 3D STL (384 triangles, clean manifold geometry).
-- **Bounding Box:** $1.33\text{ m}$ diagonal span ($X: [-0.58, 0.60]\text{ m}, Y: [-0.18, 0.18]\text{ m}, Z: [-0.06, 0.44]\text{ m}$).
+  - Dual Silicon Carbide (SiC) Inverter Enclosure (CNC 6061-T6 Aluminum housing: $0.44\text{ m} \times 0.28\text{ m} \times 0.12\text{ m}$)
+  - Top Cover Longitudinal Convective Heat Dissipation Fins (5 fin arrays)
+  - 800V High-Voltage DC Busbar Terminal Studs & Dielectric Barrier
+  - Embedded Gate Driver & Real-Time Controller Bay (STM32H7 / FPGA low-voltage housing matching Task E)
+  - Direct-Contact Pin-Fin Liquid Cold Plate with Coolant Inlet ($32^\circ\text{C}$) and Outlet ($42^\circ\text{C}$) Quick-Disconnect Ports
+  - 3-Phase High-Current AC Busbars ($U, V, W$ motor feeds)
+  - YASA-Style Axial-Flux High-Torque Traction Motor Stator Casing ($0.40\text{ m}$ diameter) with 8 radial concentrated electromagnetic copper winding coils
+  - Central Drive Spline Shaft & High-Speed Bearing Cartridge (gearbox coupling)
+  - 4 Structural Subframe Mounting Flanges (Chassis Ground Brackets)
+- **Format:** Universal 3D STL (432 triangles, clean manifold watertight geometry).
+- **Bounding Box:** $0.84\text{ m}$ diagonal span ($X: [-0.28, 0.27]\text{ m}, Y: [-0.23, 0.23]\text{ m}, Z: [-0.18, 0.25]\text{ m}$).
 
 ---
 
-## 4. Project LION ANSYS FEA Cloud: `project_lion_ansys_results.csv`
-- **File Name:** `project_lion_ansys_results.csv`
-- **Provenance:** **SYNTHETIC DATASET** mimicking ANSYS Mechanical 2026 R1 Thermal-Electric simulation of 5.2 m/s gallop under continuous BLDC motor torque dissipation and forced convective boundary layer.
+## 4. Formula-E Launch Mode ANSYS FEA Cloud: `formula_e_inverter_ansys_results.csv`
+- **File Name:** `formula_e_inverter_ansys_results.csv`
+- **Provenance:** **SYNTHETIC DATASET** mimicking ANSYS Mechanical 2026 R1 Electro-Thermal Multiphysics simulation of 250 kW full-throttle standing-start launch acceleration ($0-200\text{ km/h}$ in 4.8s).
 - **Thermal Mapping:**
-  - BLDC Actuator Motors (Hip/Knee joints): Hot red zones ($81.5^\circ\text{C} - 89.2^\circ\text{C}$)
-  - Central Battery Pack & Motor Controllers: Warm orange ($62.0^\circ\text{C} - 68.5^\circ\text{C}$)
-  - Onboard Compute Brain (FPGA / MCU Spine): Amber ($52.0^\circ\text{C} - 58.0^\circ\text{C}$)
-  - Spine Heat Sink Fins: Dissipation yellow ($42.0^\circ\text{C} - 48.0^\circ\text{C}$)
-  - Titanium Upper Leg Struts: Conductive teal ($38.0^\circ\text{C} - 46.0^\circ\text{C}$)
-  - Structural Carbon Skin & Paws: Cool ANSYS blue ($24.0^\circ\text{C} - 27.5^\circ\text{C}$)
-- **Node Count:** 293 nodes.
+  - SiC MOSFET Half-Bridge Junctions: Peak launch hotspots ($118.0^\circ\text{C} - 124.8^\circ\text{C}$)
+  - Axial-Flux Stator Copper Windings: $I^2 R$ launch torque dissipation ($86.5^\circ\text{C} - 96.5^\circ\text{C}$)
+  - 3-Phase AC Output & DC-Link Busbars: High-current conduction ($72.0^\circ\text{C} - 79.5^\circ\text{C}$)
+  - DC-Link High-Frequency Film Capacitor Bank: Ripple current heating ($58.0^\circ\text{C} - 64.5^\circ\text{C}$)
+  - Embedded Gate Driver & STM32 / FPGA Controller Board: Signal logic heating ($48.0^\circ\text{C} - 54.5^\circ\text{C}$)
+  - Pin-Fin Liquid Cold Plate & Internal Water-Glycol Flow: Forced convective cooling ($32.0^\circ\text{C} - 42.0^\circ\text{C}$)
+  - Aluminum Chassis Shell & Grounding Brackets: Ambient equilibrium ($24.0^\circ\text{C} - 28.5^\circ\text{C}$)
+- **Node Count:** 522 nodes.
 
 ---
 

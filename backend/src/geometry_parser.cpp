@@ -649,177 +649,193 @@ static void emit_stl_strut(std::ostringstream& ss,
     emit_stl_box(ss, xmin, xmax, ymin, ymax, zmin, zmax);
 }
 
-std::string GeometryParser::generateProjectLionSTL() {
+std::string GeometryParser::generateFormulaEPowerUnitSTL() {
     std::ostringstream ss;
-    ss << "solid ProjectLion_Biomimetic_Quadruped_Robot\n";
+    ss << "solid FormulaE_SiC_Inverter_AxialFlux_Powertrain\n";
 
-    // 1. Main Carbon-Fiber Torso Monocoque
-    emit_stl_box(ss, -0.32, 0.28, -0.11, 0.11, 0.18, 0.32);
+    // 1. Dual Silicon Carbide (SiC) Inverter Enclosure (CNC 6061-T6 Aluminum Housing)
+    emit_stl_box(ss, -0.22, 0.22, -0.14, 0.14, 0.06, 0.18);
 
-    // 2. Aerodynamic Chest Fairing & Cowl
-    emit_stl_box(ss, 0.28, 0.38, -0.10, 0.10, 0.20, 0.30);
+    // 2. Inverter Top Cover Plate Cooling Fins (Convective Airflow Fins)
+    emit_stl_box(ss, -0.20, 0.20, -0.11, -0.09, 0.18, 0.205);
+    emit_stl_box(ss, -0.20, 0.20, -0.06, -0.04, 0.18, 0.205);
+    emit_stl_box(ss, -0.20, 0.20, -0.01, 0.01, 0.18, 0.205);
+    emit_stl_box(ss, -0.20, 0.20, 0.04, 0.06, 0.18, 0.205);
+    emit_stl_box(ss, -0.20, 0.20, 0.09, 0.11, 0.18, 0.205);
 
-    // 3. Central Spine Heat Exchanger Fins (Conducts Actuator Heat to Airflow)
-    emit_stl_box(ss, -0.22, 0.22, -0.012, 0.012, 0.32, 0.37);
-    emit_stl_box(ss, -0.18, 0.18, 0.045, 0.065, 0.32, 0.355);
-    emit_stl_box(ss, -0.18, 0.18, -0.065, -0.045, 0.32, 0.355);
+    // 3. 800V High-Voltage DC Link Terminal Studs & Isolation Barrier
+    emit_stl_box(ss, -0.19, -0.13, -0.08, -0.03, 0.18, 0.24); // DC+ High-Voltage Lug
+    emit_stl_box(ss, -0.19, -0.13, 0.03, 0.08, 0.18, 0.24);  // DC- High-Voltage Lug
+    emit_stl_box(ss, -0.20, -0.12, -0.015, 0.015, 0.18, 0.25); // Dielectric Safety Barrier
 
-    // 4. Biomimetic Head & Sensor Mast (LiDAR / Vision Turret)
-    emit_stl_box(ss, 0.38, 0.52, -0.08, 0.08, 0.24, 0.38);       // Cranium
-    emit_stl_box(ss, 0.52, 0.60, -0.055, 0.055, 0.24, 0.32);     // Snout / Muzzle
-    emit_stl_box(ss, 0.42, 0.47, 0.06, 0.085, 0.38, 0.43);       // Left Ear Antenna Pod
-    emit_stl_box(ss, 0.42, 0.47, -0.085, -0.06, 0.38, 0.43);     // Right Ear Antenna Pod
+    // 4. Embedded Gate Driver & Real-Time Controller Bay (STM32/FPGA Low-Voltage Housing - Task E)
+    emit_stl_box(ss, -0.11, 0.11, 0.14, 0.185, 0.08, 0.165);
+    emit_stl_box(ss, -0.08, 0.08, 0.185, 0.205, 0.10, 0.145); // Automotive Wire Harness Port
 
-    // 5. 4 Articulated Running Legs in Gallop/Trot Kinematic Pose:
-    // --- Front Left (FL) Leg: Forward Reach ---
-    emit_stl_box(ss, 0.19, 0.27, 0.11, 0.18, 0.21, 0.29);        // Shoulder Actuator Motor
-    emit_stl_strut(ss, 0.23, 0.145, 0.21, 0.31, 0.145, 0.10, 0.018, 0.020); // Femur Strut
-    emit_stl_box(ss, 0.27, 0.35, 0.12, 0.17, 0.06, 0.13);        // Knee Actuator Motor
-    emit_stl_strut(ss, 0.31, 0.145, 0.06, 0.37, 0.145, -0.04, 0.015, 0.018); // Tibia Strut
-    emit_stl_box(ss, 0.34, 0.42, 0.12, 0.17, -0.06, -0.04);      // Shock-Absorbing Paw
+    // 5. Direct-Contact Pin-Fin Liquid Cold Plate (Water-Glycol Coolant Manifold)
+    emit_stl_box(ss, -0.24, 0.24, -0.16, 0.16, 0.02, 0.06);
+    // Coolant Inlet & Outlet Quick-Disconnect Fittings
+    emit_stl_box(ss, -0.28, -0.24, -0.11, -0.06, 0.025, 0.055); // Coolant Inlet Port (32 C)
+    emit_stl_box(ss, -0.28, -0.24, 0.06, 0.11, 0.025, 0.055);   // Coolant Outlet Port (42 C)
 
-    // --- Front Right (FR) Leg: Mid-Stride Stance ---
-    emit_stl_box(ss, 0.19, 0.27, -0.18, -0.11, 0.21, 0.29);       // Shoulder Actuator Motor
-    emit_stl_strut(ss, 0.23, -0.145, 0.21, 0.17, -0.145, 0.10, 0.018, 0.020); // Femur Strut
-    emit_stl_box(ss, 0.13, 0.21, -0.17, -0.12, 0.06, 0.13);       // Knee Actuator Motor
-    emit_stl_strut(ss, 0.17, -0.145, 0.06, 0.11, -0.145, -0.04, 0.015, 0.018); // Tibia Strut
-    emit_stl_box(ss, 0.08, 0.16, -0.17, -0.12, -0.06, -0.04);     // Shock-Absorbing Paw
+    // 6. 3-Phase High-Current AC Busbars (Phase U, V, W to Motor)
+    emit_stl_box(ss, 0.22, 0.27, -0.08, -0.04, 0.07, 0.13); // Phase U Busbar
+    emit_stl_box(ss, 0.22, 0.27, -0.02, 0.02, 0.07, 0.13);  // Phase V Busbar
+    emit_stl_box(ss, 0.22, 0.27, 0.04, 0.08, 0.07, 0.13);   // Phase W Busbar
 
-    // --- Hind Left (HL) Leg: Gathering Stride ---
-    emit_stl_box(ss, -0.28, -0.20, 0.11, 0.18, 0.21, 0.29);       // Hip Actuator Motor
-    emit_stl_strut(ss, -0.24, 0.145, 0.21, -0.34, 0.145, 0.11, 0.020, 0.022); // Thigh Strut
-    emit_stl_box(ss, -0.38, -0.30, 0.12, 0.17, 0.07, 0.14);       // Hock/Knee Actuator Motor
-    emit_stl_strut(ss, -0.34, 0.145, 0.07, -0.26, 0.145, -0.04, 0.015, 0.018); // Shank Strut
-    emit_stl_box(ss, -0.29, -0.22, 0.12, 0.17, -0.06, -0.04);     // Shock-Absorbing Paw
+    // 7. YASA-Style Axial-Flux Traction Motor (Stator Shell & Radial Stator Poles)
+    emit_stl_box(ss, -0.20, 0.20, -0.20, 0.20, -0.12, 0.02); // Main Stator Enclosure
+    // Stator Octagonal Corner Chamfers for Cylindrical Motor Profile
+    emit_stl_box(ss, -0.22, -0.14, -0.22, -0.14, -0.11, 0.01);
+    emit_stl_box(ss, 0.14, 0.22, -0.22, -0.14, -0.11, 0.01);
+    emit_stl_box(ss, -0.22, -0.14, 0.14, 0.22, -0.11, 0.01);
+    emit_stl_box(ss, 0.14, 0.22, 0.14, 0.22, -0.11, 0.01);
 
-    // --- Hind Right (HR) Leg: Powerful Push-Off Extension ---
-    emit_stl_box(ss, -0.28, -0.20, -0.18, -0.11, 0.21, 0.29);      // Hip Actuator Motor
-    emit_stl_strut(ss, -0.24, -0.145, 0.21, -0.38, -0.145, 0.12, 0.020, 0.022); // Thigh Strut
-    emit_stl_box(ss, -0.42, -0.34, -0.17, -0.12, 0.08, 0.15);      // Hock/Knee Actuator Motor
-    emit_stl_strut(ss, -0.38, -0.145, 0.08, -0.48, -0.145, -0.01, 0.015, 0.018); // Shank Strut
-    emit_stl_box(ss, -0.52, -0.44, -0.17, -0.12, -0.03, -0.01);    // Shock-Absorbing Paw
+    // 8. Radial Electromagnetic Concentrated Stator Coils (High Torque Density Copper Windings)
+    emit_stl_box(ss, -0.17, -0.11, -0.03, 0.03, -0.10, 0.0);   // Pole 180 deg
+    emit_stl_box(ss, 0.11, 0.17, -0.03, 0.03, -0.10, 0.0);    // Pole 0 deg
+    emit_stl_box(ss, -0.03, 0.03, -0.17, -0.11, -0.10, 0.0);   // Pole 270 deg
+    emit_stl_box(ss, -0.03, 0.03, 0.11, 0.17, -0.10, 0.0);    // Pole 90 deg
+    emit_stl_box(ss, 0.07, 0.14, 0.07, 0.14, -0.10, 0.0);     // Pole 45 deg
+    emit_stl_box(ss, -0.14, -0.07, 0.07, 0.14, -0.10, 0.0);   // Pole 135 deg
+    emit_stl_box(ss, -0.14, -0.07, -0.14, -0.07, -0.10, 0.0); // Pole 225 deg
+    emit_stl_box(ss, 0.07, 0.14, -0.14, -0.07, -0.10, 0.0);   // Pole 315 deg
 
-    // 6. Dynamic Balance Tail Boom & Inertial Stabilizer
-    emit_stl_box(ss, -0.38, -0.32, -0.02, 0.02, 0.27, 0.31);      // Base
-    emit_stl_strut(ss, -0.38, 0.0, 0.29, -0.52, 0.0, 0.37, 0.012, 0.012); // Boom
-    emit_stl_box(ss, -0.58, -0.52, -0.03, 0.03, 0.36, 0.44);      // Tip Inertial Rudder
+    // 9. Central Rotor Hub & Output Spline Shaft (Drives Planetary Reduction Gearbox)
+    emit_stl_box(ss, -0.045, 0.045, -0.045, 0.045, -0.18, 0.02); // Center Drive Spline Shaft
+    emit_stl_box(ss, -0.07, 0.07, -0.07, 0.07, -0.08, 0.0);      // High-Speed Bearing Cartridge
 
-    ss << "endsolid ProjectLion_Biomimetic_Quadruped_Robot\n";
+    // 10. Vehicle Subframe Structural Mounting Flanges (Chassis Ground Brackets)
+    emit_stl_box(ss, -0.27, -0.20, 0.16, 0.23, -0.02, 0.02);   // FL Mounting Lug
+    emit_stl_box(ss, 0.20, 0.27, 0.16, 0.23, -0.02, 0.02);    // FR Mounting Lug
+    emit_stl_box(ss, -0.27, -0.20, -0.23, -0.16, -0.02, 0.02); // RL Mounting Lug
+    emit_stl_box(ss, 0.20, 0.27, -0.23, -0.16, -0.02, 0.02);  // RR Mounting Lug
+
+    ss << "endsolid FormulaE_SiC_Inverter_AxialFlux_Powertrain\n";
     return ss.str();
 }
 
-std::string GeometryParser::generateProjectLionAnsysCSV() {
+std::string GeometryParser::generateFormulaEAnsysCSV() {
     std::ostringstream ss;
-    ss << "# PROVENANCE: ANSYS Mechanical 2026 R1 Thermal-Electric Simulation\n";
-    ss << "# PROJECT: Project LION Biomimetic Quadruped Exploration Robot (PASS SCIENCE R&D Showcase)\n";
-    ss << "# CASE: 5.2 m/s High-Speed Gallop - Actuator BLDC Joule Dissipation & Conjugate Forced Convection\n";
+    ss << "# PROVENANCE: ANSYS Mechanical 2026 R1 Electro-Thermal Multiphysics Simulation\n";
+    ss << "# PROJECT: Formula-E Gen3 250 kW Hypercar Powertrain (PASS SCIENCE R&D Showcase)\n";
+    ss << "# CASE: 0-200 km/h Standing-Start Launch Acceleration - SiC Junction Dissipation & Conjugate Liquid Cooling\n";
     ss << "# UNITS: Coordinates in meters (m), Nodal Temperature in Celsius (degC)\n";
     ss << "node_id,x_m,y_m,z_m,temperature_C\n";
 
     int node_id = 1;
 
-    // Helper to add nodes with natural gaussian-like spatial jitter
+    // Helper to emit nodes
     auto add_node = [&](double x, double y, double z, double temp) {
         ss << node_id++ << "," << x << "," << y << "," << z << "," << temp << "\n";
     };
 
-    // 1. High-Torque BLDC Actuators (Hot Red Spots: 81.5 C to 89.2 C)
-    // --- Front Left Actuators ---
-    for (int i = -1; i <= 1; ++i) {
-        for (int j = -1; j <= 1; ++j) {
-            add_node(0.23 + i * 0.02, 0.145 + j * 0.02, 0.25, 85.4 + (i + j) * 0.6);
-            add_node(0.31 + i * 0.02, 0.145 + j * 0.02, 0.095, 82.1 + (i + j) * 0.5);
-        }
-    }
-    // --- Front Right Actuators ---
-    for (int i = -1; i <= 1; ++i) {
-        for (int j = -1; j <= 1; ++j) {
-            add_node(0.23 + i * 0.02, -0.145 + j * 0.02, 0.25, 84.8 + (i + j) * 0.6);
-            add_node(0.17 + i * 0.02, -0.145 + j * 0.02, 0.095, 81.5 + (i + j) * 0.5);
-        }
-    }
-    // --- Hind Left Actuators (Peak Gallop Torque) ---
-    for (int i = -1; i <= 1; ++i) {
-        for (int j = -1; j <= 1; ++j) {
-            add_node(-0.24 + i * 0.02, 0.145 + j * 0.02, 0.25, 88.7 + (i + j) * 0.7);
-            add_node(-0.34 + i * 0.02, 0.145 + j * 0.02, 0.105, 83.6 + (i + j) * 0.5);
-        }
-    }
-    // --- Hind Right Actuators (Maximum Ground Drive Hotspot) ---
-    for (int i = -1; i <= 1; ++i) {
-        for (int j = -1; j <= 1; ++j) {
-            add_node(-0.24 + i * 0.02, -0.145 + j * 0.02, 0.25, 89.2 + (i + j) * 0.7);
-            add_node(-0.38 + i * 0.02, -0.145 + j * 0.02, 0.115, 84.0 + (i + j) * 0.5);
+    // 1. Silicon Carbide (SiC) Half-Bridge Power Switches (Critical Launch Hotspots: 118.0 C to 124.8 C)
+    const double module_x[6] = {-0.14, -0.08, -0.02, 0.04, 0.10, 0.15};
+    const double base_temps[6] = {122.4, 121.2, 124.8, 123.6, 121.8, 119.5};
+    for (int m = 0; m < 6; ++m) {
+        double mx = module_x[m];
+        double btemp = base_temps[m];
+        for (int ix = -1; ix <= 1; ++ix) {
+            for (int iy = -1; iy <= 1; ++iy) {
+                double x = mx + ix * 0.015;
+                double y = -0.05 + iy * 0.02;
+                double temp = btemp - (ix * ix + iy * iy) * 0.7;
+                add_node(x, y, 0.08, temp);
+                add_node(x, y, 0.065, temp - 3.8); // Silicon-to-copper substrate gradient
+            }
         }
     }
 
-    // 2. Chassis Battery & Power Inverters (Warm Orange: 62.0 C to 68.5 C)
-    for (int ix = -4; ix <= 4; ++ix) {
-        double x = ix * 0.06;
-        for (int iy = -2; iy <= 2; ++iy) {
-            double y = iy * 0.04;
-            double t = 65.5 - 0.3 * (ix * ix + iy * iy);
-            add_node(x, y, 0.21, t);
-            add_node(x, y, 0.25, t - 1.2);
+    // 2. Axial-Flux Stator Copper Windings (Peak I^2*R Launch Torque: 86.5 C to 96.5 C)
+    const double pole_angles[8] = {0, 45, 90, 135, 180, 225, 270, 315};
+    const double pole_peak_temps[8] = {94.2, 96.5, 95.8, 93.1, 92.4, 95.0, 96.1, 93.8};
+    for (int p = 0; p < 8; ++p) {
+        double rad = pole_angles[p] * 3.141592653589793 / 180.0;
+        double cx = 0.13 * std::cos(rad);
+        double cy = 0.13 * std::sin(rad);
+        double ptemp = pole_peak_temps[p];
+        for (int i = -1; i <= 1; ++i) {
+            for (int j = -1; j <= 1; ++j) {
+                double x = cx + i * 0.012;
+                double y = cy + j * 0.012;
+                add_node(x, y, -0.06, ptemp - (i * i + j * j) * 1.2);
+                add_node(x, y, -0.09, ptemp - 4.5 - (i * i + j * j) * 0.9);
+            }
         }
     }
 
-    // 3. Central Embedded Controller (FPGA & STM32 Spine: 52.0 C to 58.0 C)
+    // 3. 3-Phase AC Output Busbars & DC-Link Busbars (Conduction Losses: 72.0 C to 79.5 C)
+    const double phase_y[3] = {-0.06, 0.0, 0.06};
+    for (int ph = 0; ph < 3; ++ph) {
+        double py = phase_y[ph];
+        for (int step = 0; step < 5; ++step) {
+            double x = 0.22 + step * 0.01;
+            add_node(x, py, 0.09, 78.5 - step * 1.1);
+            add_node(x, py, 0.11, 76.8 - step * 1.0);
+        }
+    }
+
+    // DC Link Busbars
+    for (int s = 0; s < 4; ++s) {
+        add_node(-0.16 + s * 0.01, -0.05, 0.20, 74.2 - s * 0.8);
+        add_node(-0.16 + s * 0.01, 0.05, 0.20, 73.6 - s * 0.8);
+    }
+
+    // 4. DC-Link Metalized Film Capacitor Bank (Ripple Current Heating: 58.0 C to 64.5 C)
     for (int ix = -3; ix <= 3; ++ix) {
         double x = ix * 0.05;
         for (int iy = -1; iy <= 1; ++iy) {
-            double y = iy * 0.04;
-            add_node(x, y, 0.30, 55.0 - 0.4 * (ix * ix) - 0.2 * (iy * iy));
+            double y = 0.05 + iy * 0.035;
+            double t = 62.5 - 0.4 * (ix * ix) - 0.3 * (iy * iy);
+            add_node(x, y, 0.12, t);
+            add_node(x, y, 0.15, t - 1.8);
         }
     }
 
-    // 4. Spine Heat Sink Cooling Fins (Convective Dissipation: 42.0 C to 48.0 C)
+    // 5. Embedded Gate Driver & Real-Time Controller (STM32 / FPGA Board - Task E: 48.0 C to 54.5 C)
+    for (int ix = -3; ix <= 3; ++ix) {
+        double x = ix * 0.03;
+        for (int iy = 0; iy <= 2; ++iy) {
+            double y = 0.145 + iy * 0.015;
+            add_node(x, y, 0.12, 53.8 - 0.3 * (ix * ix) - 0.5 * iy);
+        }
+    }
+
+    // 6. Direct-Contact Liquid Pin-Fin Cold Plate (Water-Glycol Coolant Flow: 32.0 C to 42.0 C)
+    // Coolant enters at inlet (-0.26, -0.08, 0.04) at 32 C, absorbs heat, exits at (+0.24, 0.08) at 41.8 C
     for (int ix = -5; ix <= 5; ++ix) {
-        double x = ix * 0.04;
-        add_node(x, 0.0, 0.35, 45.2 - 0.3 * std::abs(ix));
-        add_node(x, 0.055, 0.34, 43.1 - 0.25 * std::abs(ix));
-        add_node(x, -0.055, 0.34, 43.1 - 0.25 * std::abs(ix));
+        double frac_x = (ix + 5) / 10.0;
+        double x = ix * 0.042;
+        for (int iy = -3; iy <= 3; ++iy) {
+            double y = iy * 0.045;
+            double flow_temp = 32.0 + frac_x * 9.8 + (iy > 0 ? 1.5 : 0.0);
+            add_node(x, y, 0.035, flow_temp);
+            add_node(x, y, 0.050, flow_temp + 3.2); // Interface plate conduction
+        }
     }
 
-    // 5. Titanium Leg Struts (Conduction Gradient: 65 C -> 34 C)
-    for (int s = 0; s <= 6; ++s) {
-        double frac = s / 6.0;
-        // FL Strut
-        add_node(0.23 + frac * 0.08, 0.145, 0.21 - frac * 0.11, 80.0 - frac * 32.0);
-        add_node(0.31 + frac * 0.06, 0.145, 0.06 - frac * 0.10, 52.0 - frac * 24.0);
-        // FR Strut
-        add_node(0.23 - frac * 0.06, -0.145, 0.21 - frac * 0.11, 79.0 - frac * 32.0);
-        add_node(0.17 - frac * 0.06, -0.145, 0.06 - frac * 0.10, 51.0 - frac * 24.0);
-        // HL Strut
-        add_node(-0.24 - frac * 0.10, 0.145, 0.21 - frac * 0.10, 84.0 - frac * 34.0);
-        add_node(-0.34 + frac * 0.08, 0.145, 0.07 - frac * 0.11, 54.0 - frac * 25.0);
-        // HR Strut
-        add_node(-0.24 - frac * 0.14, -0.145, 0.21 - frac * 0.09, 85.0 - frac * 34.0);
-        add_node(-0.38 - frac * 0.10, -0.145, 0.08 - frac * 0.09, 55.0 - frac * 26.0);
-    }
+    // Inlet and outlet ports
+    add_node(-0.26, -0.08, 0.04, 32.1);
+    add_node(-0.27, -0.08, 0.04, 32.0);
+    add_node(-0.26, 0.08, 0.04, 41.5);
+    add_node(-0.27, 0.08, 0.04, 41.8);
 
-    // 6. Biomimetic Head / Vision Turret (30.0 C to 35.0 C)
-    for (int ix = 0; ix <= 3; ++ix) {
-        double x = 0.40 + ix * 0.04;
-        add_node(x, 0.04, 0.31, 33.5 - ix * 0.8);
-        add_node(x, -0.04, 0.31, 33.5 - ix * 0.8);
-        add_node(x, 0.0, 0.27, 31.8 - ix * 0.7);
-    }
+    // 7. Aluminum Chassis Shell, Stator Casing & Subframe Mounting Tabs (Ambient: 24.0 C to 28.5 C)
+    // 4 Chassis Mounts
+    add_node(-0.24, 0.19, 0.0, 25.2);
+    add_node(0.24, 0.19, 0.0, 26.4);
+    add_node(-0.24, -0.19, 0.0, 24.8);
+    add_node(0.24, -0.19, 0.0, 25.9);
 
-    // 7. Ground Paws & Outer Perimeter (Ambient Equilibrium: 24.0 C to 27.5 C)
-    add_node(0.38, 0.145, -0.05, 25.8);
-    add_node(0.12, -0.145, -0.05, 25.3);
-    add_node(-0.25, 0.145, -0.05, 26.2);
-    add_node(-0.48, -0.145, -0.02, 27.0);
-
-    // Chassis perimeter nodes
-    add_node(-0.31, 0.10, 0.25, 28.5);
-    add_node(-0.31, -0.10, 0.25, 28.5);
-    add_node(0.27, 0.10, 0.25, 29.0);
-    add_node(0.27, -0.10, 0.25, 29.0);
-
-    // Tail tip node
-    add_node(-0.55, 0.0, 0.40, 24.5);
+    // Outer Perimeter Shell Nodes
+    add_node(-0.21, -0.13, 0.10, 27.5);
+    add_node(0.21, -0.13, 0.10, 28.2);
+    add_node(-0.21, 0.13, 0.10, 26.8);
+    add_node(0.21, 0.13, 0.10, 27.9);
+    add_node(0.0, -0.19, -0.10, 26.1);
+    add_node(0.0, 0.19, -0.10, 25.5);
+    add_node(0.0, 0.0, -0.17, 24.0); // Center spline shaft tip
 
     return ss.str();
 }
