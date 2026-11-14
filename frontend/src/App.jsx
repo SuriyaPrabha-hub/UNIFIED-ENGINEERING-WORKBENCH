@@ -8,14 +8,13 @@ import HardwareView from './views/HardwareView';
 import NeuralNetView from './views/NeuralNetView';
 import ReportsView from './views/ReportsView';
 import { api } from './api/client';
-import { Activity, Bell, RefreshCw, Cpu, Layers } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [serverOnline, setServerOnline] = useState(false);
   const [serverStatus, setServerStatus] = useState(null);
 
-  // Poll backend health every 4 seconds
   useEffect(() => {
     checkServer();
     const interval = setInterval(checkServer, 4000);
@@ -54,7 +53,7 @@ export default function App() {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#0B0F19] text-gray-100 font-sans">
+    <div className="flex min-h-screen bg-[#F4F5F7] text-[#1B1F23] font-sans">
       {/* Sidebar Navigation */}
       <Sidebar 
         activeTab={activeTab} 
@@ -64,22 +63,22 @@ export default function App() {
 
       {/* Main Content Area */}
       <div className="flex-1 ml-64 flex flex-col min-h-screen">
-        {/* Top Navbar */}
-        <header className="h-16 bg-[#111827]/80 backdrop-blur-md border-b border-[#1F2937] sticky top-0 z-20 px-8 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <span className="text-xs uppercase tracking-wider text-gray-400 font-mono">Module</span>
-            <span className="text-gray-600">/</span>
-            <span className="text-sm font-semibold text-white capitalize font-mono">
+        {/* Top CAD-Style Status Bar */}
+        <header className="h-11 bg-[#FFFFFF] border-b border-[#D5D9DE] sticky top-0 z-20 px-6 flex items-center justify-between">
+          <div className="flex items-center space-x-2 text-xs">
+            <span className="font-mono text-[11px] uppercase tracking-wider text-[#5F6B76]">Workbench</span>
+            <span className="text-[#D5D9DE]">/</span>
+            <span className="font-mono font-semibold text-[#1B1F23] uppercase">
               {activeTab.replace('-', ' ')}
             </span>
           </div>
 
-          <div className="flex items-center space-x-4">
-            {/* Live Core Indicator */}
-            <div className="flex items-center space-x-2 text-xs font-mono px-3 py-1.5 rounded-full bg-[#161F30] border border-[#1F2937]">
-              <span className={`w-2 h-2 rounded-full ${serverOnline ? 'bg-emerald-400 animate-pulse' : 'bg-rose-400'}`}></span>
-              <span className="text-gray-300">C++ REST Engine:</span>
-              <span className={`font-bold ${serverOnline ? 'text-emerald-400' : 'text-rose-400'}`}>
+          <div className="flex items-center space-x-3">
+            {/* C++ Core Status Indicator */}
+            <div className="flex items-center space-x-2 text-xs font-mono px-2.5 py-1 rounded-[4px] bg-[#F4F5F7] border border-[#D5D9DE]">
+              <span className={`w-2 h-2 rounded-[1px] ${serverOnline ? 'bg-[#2E7D32]' : 'bg-[#C62828]'}`}></span>
+              <span className="text-[#5F6B76]">C++ REST:</span>
+              <span className={`font-bold ${serverOnline ? 'text-[#2E7D32]' : 'text-[#C62828]'}`}>
                 {serverOnline ? 'CONNECTED' : 'DISCONNECTED'}
               </span>
             </div>
@@ -87,15 +86,15 @@ export default function App() {
             <button
               onClick={checkServer}
               title="Refresh connection"
-              className="p-2 rounded-lg bg-[#1F2937] hover:bg-[#374151] border border-[#374151] text-gray-300 transition"
+              className="p-1 rounded-[4px] bg-[#FFFFFF] hover:bg-[#F4F5F7] border border-[#D5D9DE] text-[#5F6B76] transition-none"
             >
-              <RefreshCw className="w-4 h-4" />
+              <RefreshCw className="w-3.5 h-3.5" />
             </button>
           </div>
         </header>
 
         {/* View Viewport */}
-        <main className="flex-1 p-8 max-w-7xl w-full mx-auto">
+        <main className="flex-1 p-6 max-w-7xl w-full mx-auto">
           {renderActiveView()}
         </main>
       </div>

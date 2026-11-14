@@ -8,76 +8,74 @@ import {
   ShieldCheck, 
   ArrowRight,
   Server,
-  Zap,
-  CheckCircle2
+  Layers
 } from 'lucide-react';
 import StatusCard from '../components/StatusCard';
 
 export default function DashboardView({ setActiveTab, serverStatus }) {
   return (
-    <div className="space-y-6">
-      {/* Top Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-900/40 via-indigo-900/30 to-purple-900/20 border border-blue-500/20 p-8 shadow-xl">
-        <div className="relative z-10 max-w-3xl">
-          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-mono mb-4">
-            <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
-            <span>PASS SCIENCE WORKS | R&D INTERNSHIP 2026-2027</span>
+    <div className="space-y-5">
+      {/* Top Engineering Specification Banner */}
+      <div className="bg-[#FFFFFF] border border-[#D5D9DE] rounded-[4px] p-5">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="max-w-3xl">
+            <div className="inline-flex items-center space-x-2 px-2 py-0.5 rounded-[4px] border border-[#D5D9DE] bg-[#F4F5F7] text-[#5F6B76] text-[10px] font-mono mb-2">
+              <span>PASS SCIENCE WORKS | R&D ASSESSMENT 2026-2027</span>
+            </div>
+            <h1 className="text-xl font-bold text-[#1B1F23] tracking-tight">
+              Unified Engineering Workbench
+            </h1>
+            <p className="mt-1 text-xs text-[#5F6B76] leading-relaxed">
+              Multi-domain engineering platform integrating C++17 1D thermal finite-element analysis, 
+              ASCII STL & ANSYS CSV visualization, multicore parallel benchmarking, embedded hardware telemetry simulation, 
+              and central finite-difference gradient verification.
+            </p>
           </div>
-          <h1 className="text-3xl font-extrabold text-white tracking-tight sm:text-4xl">
-            Unified Engineering Workbench
-          </h1>
-          <p className="mt-3 text-base text-gray-300 leading-relaxed">
-            Multi-domain engineering assessment platform integrating C++17 thermal finite-element analysis, 
-            3D CAD/ANSYS visualization, multicore multithreaded benchmarking, embedded hardware telemetry simulation, 
-            and verified neural network backpropagation.
-          </p>
-          <div className="mt-6 flex flex-wrap gap-3">
+
+          <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={() => setActiveTab('thermal')}
-              className="inline-flex items-center px-4 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium transition shadow-lg shadow-blue-500/25"
+              className="inline-flex items-center px-3 py-1.5 rounded-[4px] bg-[#E8590C] hover:bg-[#d04f0a] text-white text-xs font-semibold"
             >
-              <Flame className="w-4 h-4 mr-2" /> Launch Thermal FEA
+              <Flame className="w-3.5 h-3.5 mr-1.5" /> Launch Thermal FEA
             </button>
             <button
               onClick={() => setActiveTab('geometry')}
-              className="inline-flex items-center px-4 py-2.5 rounded-lg bg-[#1F2937] hover:bg-[#374151] text-gray-200 text-sm font-medium transition border border-[#374151]"
+              className="inline-flex items-center px-3 py-1.5 rounded-[4px] bg-[#FFFFFF] hover:bg-[#F4F5F7] text-[#1B1F23] text-xs font-semibold border border-[#D5D9DE]"
             >
-              <Box className="w-4 h-4 mr-2" /> Inspect 3D Geometry
+              <Box className="w-3.5 h-3.5 mr-1.5 text-[#5F6B76]" /> CAD Geometry
             </button>
             <button
               onClick={() => setActiveTab('performance')}
-              className="inline-flex items-center px-4 py-2.5 rounded-lg bg-[#1F2937] hover:bg-[#374151] text-gray-200 text-sm font-medium transition border border-[#374151]"
+              className="inline-flex items-center px-3 py-1.5 rounded-[4px] bg-[#FFFFFF] hover:bg-[#F4F5F7] text-[#1B1F23] text-xs font-semibold border border-[#D5D9DE]"
             >
-              <Cpu className="w-4 h-4 mr-2" /> Multicore Lab
+              <Cpu className="w-3.5 h-3.5 mr-1.5 text-[#5F6B76]" /> Multicore Lab
             </button>
           </div>
         </div>
       </div>
 
       {/* Metrics Row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
         <StatusCard 
           title="Backend Engine" 
           value="C++17 UCRT" 
           subtext={serverStatus ? `Online | ${serverStatus.hardware_concurrency || 8} Logical Cores` : 'Connecting to Core...'} 
           icon={Server} 
-          color="blue"
           badge="Native"
         />
         <StatusCard 
-          title="Thermal FEA Solvers" 
+          title="Thermal FEA Solver" 
           value="O(h²) Order" 
           subtext="Quadratic midpoint convergence verified" 
           icon={Flame} 
-          color="emerald"
           badge="Verified"
         />
         <StatusCard 
-          title="Parallel Speedup" 
+          title="Parallel Workload" 
           value="1 to 4 Workers" 
           subtext="Deterministic order | Diff <= 1e-8 C" 
           icon={Cpu} 
-          color="purple"
           badge="Multithreaded"
         />
         <StatusCard 
@@ -85,134 +83,166 @@ export default function DashboardView({ setActiveTab, serverStatus }) {
           value="3 Devices" 
           subtext="MCU, FPGA & JTAG TAP Mocks" 
           icon={CircuitBoard} 
-          color="amber"
           badge="Simulated"
         />
       </div>
 
-      {/* Core Engineering Modules Grid */}
+      {/* Engineering Workbench Modules Grid */}
       <div>
-        <h2 className="text-lg font-bold text-white mb-4 flex items-center">
-          <Zap className="w-5 h-5 text-blue-400 mr-2" /> Engineering Workbench Modules
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="flex items-center justify-between mb-2.5">
+          <h2 className="text-xs font-semibold text-[#5F6B76] uppercase tracking-wider font-mono">
+            Engineering Modules
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {/* Card 1: Thermal FEA */}
           <div 
             onClick={() => setActiveTab('thermal')}
-            className="group cursor-pointer bg-[#111827] border border-[#1F2937] rounded-xl p-5 hover:border-blue-500/50 hover:bg-[#131d33] transition-all flex flex-col justify-between"
+            className="cursor-pointer bg-[#FFFFFF] border border-[#D5D9DE] rounded-[4px] p-4 hover:border-[#5F6B76] flex flex-col justify-between"
           >
             <div>
-              <div className="w-10 h-10 rounded-lg bg-orange-500/10 border border-orange-500/20 text-orange-400 flex items-center justify-center mb-4">
-                <Flame className="w-5 h-5" />
+              <div className="flex items-center justify-between mb-2">
+                <div className="w-7 h-7 rounded-[4px] border border-[#D5D9DE] bg-[#F4F5F7] text-[#1B1F23] flex items-center justify-center">
+                  <Flame className="w-4 h-4 text-[#E8590C]" />
+                </div>
+                <span className="text-[10px] font-mono border border-[#D5D9DE] px-1.5 py-0.2 rounded-[4px] text-[#5F6B76]">
+                  TASK C
+                </span>
               </div>
-              <h3 className="font-semibold text-white group-hover:text-blue-400 transition">1D Thermal Finite Element Analysis</h3>
-              <p className="text-xs text-gray-400 mt-2 leading-relaxed">
-                Steady-state uniform rod heat equation with volumetric generation. Solves N=10, 20, 40, 80 elements with Gaussian elimination, exact analytical comparison, and midpoint convergence.
+              <h3 className="font-semibold text-xs text-[#1B1F23]">1D Thermal Finite Element Analysis</h3>
+              <p className="text-[11px] text-[#5F6B76] mt-1.5 leading-relaxed">
+                Uniform rod heat conduction with internal generation. Solves N=10, 20, 40, 80 elements with Gaussian elimination, exact analytical solution comparison, and midpoint convergence verification.
               </p>
             </div>
-            <div className="mt-4 pt-3 border-t border-[#1F2937] flex items-center justify-between text-xs text-blue-400 font-medium">
-              <span>Run Solver</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition" />
+            <div className="mt-3 pt-2.5 border-t border-[#D5D9DE] flex items-center justify-between text-[11px] text-[#1B1F23] font-medium">
+              <span>Open Solver</span>
+              <ArrowRight className="w-3.5 h-3.5 text-[#5F6B76]" />
             </div>
           </div>
 
           {/* Card 2: 3D CAD & ANSYS */}
           <div 
             onClick={() => setActiveTab('geometry')}
-            className="group cursor-pointer bg-[#111827] border border-[#1F2937] rounded-xl p-5 hover:border-blue-500/50 hover:bg-[#131d33] transition-all flex flex-col justify-between"
+            className="cursor-pointer bg-[#FFFFFF] border border-[#D5D9DE] rounded-[4px] p-4 hover:border-[#5F6B76] flex flex-col justify-between"
           >
             <div>
-              <div className="w-10 h-10 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center mb-4">
-                <Box className="w-5 h-5" />
+              <div className="flex items-center justify-between mb-2">
+                <div className="w-7 h-7 rounded-[4px] border border-[#D5D9DE] bg-[#F4F5F7] text-[#1B1F23] flex items-center justify-center">
+                  <Box className="w-4 h-4 text-[#5F6B76]" />
+                </div>
+                <span className="text-[10px] font-mono border border-[#B7791F] text-[#B7791F] px-1.5 py-0.2 rounded-[4px]">
+                  SYNTHETIC
+                </span>
               </div>
-              <h3 className="font-semibold text-white group-hover:text-blue-400 transition">CAD & ANSYS Visualization</h3>
-              <p className="text-xs text-gray-400 mt-2 leading-relaxed">
-                Stream ASCII STL triangle meshes with Three.js orbit controls. Import ANSYS CSV nodal temperatures with 3D color gradients, legend, and interactive node inspection.
+              <h3 className="font-semibold text-xs text-[#1B1F23]">CAD & ANSYS Data Visualization</h3>
+              <p className="text-[11px] text-[#5F6B76] mt-1.5 leading-relaxed">
+                Stream ASCII STL triangle meshes with Three.js orbit controls. Import ANSYS CSV nodal temperatures with classic blue-to-red legend and 3D node inspection.
               </p>
             </div>
-            <div className="mt-4 pt-3 border-t border-[#1F2937] flex items-center justify-between text-xs text-blue-400 font-medium">
+            <div className="mt-3 pt-2.5 border-t border-[#D5D9DE] flex items-center justify-between text-[11px] text-[#1B1F23] font-medium">
               <span>Open 3D Viewer</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition" />
+              <ArrowRight className="w-3.5 h-3.5 text-[#5F6B76]" />
             </div>
           </div>
 
           {/* Card 3: Multicore Lab */}
           <div 
             onClick={() => setActiveTab('performance')}
-            className="group cursor-pointer bg-[#111827] border border-[#1F2937] rounded-xl p-5 hover:border-blue-500/50 hover:bg-[#131d33] transition-all flex flex-col justify-between"
+            className="cursor-pointer bg-[#FFFFFF] border border-[#D5D9DE] rounded-[4px] p-4 hover:border-[#5F6B76] flex flex-col justify-between"
           >
             <div>
-              <div className="w-10 h-10 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center mb-4">
-                <Cpu className="w-5 h-5" />
+              <div className="flex items-center justify-between mb-2">
+                <div className="w-7 h-7 rounded-[4px] border border-[#D5D9DE] bg-[#F4F5F7] text-[#1B1F23] flex items-center justify-center">
+                  <Cpu className="w-4 h-4 text-[#5F6B76]" />
+                </div>
+                <span className="text-[10px] font-mono border border-[#D5D9DE] px-1.5 py-0.2 rounded-[4px] text-[#5F6B76]">
+                  TASK D
+                </span>
               </div>
-              <h3 className="font-semibold text-white group-hover:text-blue-400 transition">Performance & Multicore Lab</h3>
-              <p className="text-xs text-gray-400 mt-2 leading-relaxed">
-                Batch generator with fixed seed, 5 measured repetitions, median timing, speedup and efficiency for 1, 2, 3, 4 workers. Serial/parallel numerical agreement checked.
+              <h3 className="font-semibold text-xs text-[#1B1F23]">Performance & Multicore Benchmark</h3>
+              <p className="text-[11px] text-[#5F6B76] mt-1.5 leading-relaxed">
+                Batch generator with fixed seed, 5 measured repetitions, median timing, speedup and efficiency for 1, 2, 3, 4 workers. Serial/parallel numerical agreement verified.
               </p>
             </div>
-            <div className="mt-4 pt-3 border-t border-[#1F2937] flex items-center justify-between text-xs text-blue-400 font-medium">
+            <div className="mt-3 pt-2.5 border-t border-[#D5D9DE] flex items-center justify-between text-[11px] text-[#1B1F23] font-medium">
               <span>Benchmark CPU</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition" />
+              <ArrowRight className="w-3.5 h-3.5 text-[#5F6B76]" />
             </div>
           </div>
 
           {/* Card 4: Hardware Integration */}
           <div 
             onClick={() => setActiveTab('hardware')}
-            className="group cursor-pointer bg-[#111827] border border-[#1F2937] rounded-xl p-5 hover:border-blue-500/50 hover:bg-[#131d33] transition-all flex flex-col justify-between"
+            className="cursor-pointer bg-[#FFFFFF] border border-[#D5D9DE] rounded-[4px] p-4 hover:border-[#5F6B76] flex flex-col justify-between"
           >
             <div>
-              <div className="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mb-4">
-                <CircuitBoard className="w-5 h-5" />
+              <div className="flex items-center justify-between mb-2">
+                <div className="w-7 h-7 rounded-[4px] border border-[#D5D9DE] bg-[#F4F5F7] text-[#1B1F23] flex items-center justify-center">
+                  <CircuitBoard className="w-4 h-4 text-[#5F6B76]" />
+                </div>
+                <span className="text-[10px] font-mono border border-[#B7791F] text-[#B7791F] px-1.5 py-0.2 rounded-[4px]">
+                  SIMULATED
+                </span>
               </div>
-              <h3 className="font-semibold text-white group-hover:text-blue-400 transition">Embedded System Integration</h3>
-              <p className="text-xs text-gray-400 mt-2 leading-relaxed">
-                Modular workbench for STM32 MCU (3.3V), Artix-7 FPGA (1.8V level-shifted), and JTAG debug probe. Real-time telemetry, timeout injection, and reset recovery.
+              <h3 className="font-semibold text-xs text-[#1B1F23]">Embedded System Integration</h3>
+              <p className="text-[11px] text-[#5F6B76] mt-1.5 leading-relaxed">
+                Host-connected workbench architecture for STM32 MCU (3.3V), Artix-7 FPGA (1.8V level-shifted), and JTAG debug TAP probe. State machines with timeout tripping & recovery.
               </p>
             </div>
-            <div className="mt-4 pt-3 border-t border-[#1F2937] flex items-center justify-between text-xs text-blue-400 font-medium">
-              <span>Manage Hardware</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition" />
+            <div className="mt-3 pt-2.5 border-t border-[#D5D9DE] flex items-center justify-between text-[11px] text-[#1B1F23] font-medium">
+              <span>Manage Devices</span>
+              <ArrowRight className="w-3.5 h-3.5 text-[#5F6B76]" />
             </div>
           </div>
 
           {/* Card 5: Neural Network */}
           <div 
             onClick={() => setActiveTab('neural')}
-            className="group cursor-pointer bg-[#111827] border border-[#1F2937] rounded-xl p-5 hover:border-blue-500/50 hover:bg-[#131d33] transition-all flex flex-col justify-between"
+            className="cursor-pointer bg-[#FFFFFF] border border-[#D5D9DE] rounded-[4px] p-4 hover:border-[#5F6B76] flex flex-col justify-between"
           >
             <div>
-              <div className="w-10 h-10 rounded-lg bg-pink-500/10 border border-pink-500/20 text-pink-400 flex items-center justify-center mb-4">
-                <BrainCircuit className="w-5 h-5" />
+              <div className="flex items-center justify-between mb-2">
+                <div className="w-7 h-7 rounded-[4px] border border-[#D5D9DE] bg-[#F4F5F7] text-[#1B1F23] flex items-center justify-center">
+                  <BrainCircuit className="w-4 h-4 text-[#5F6B76]" />
+                </div>
+                <span className="text-[10px] font-mono border border-[#D5D9DE] px-1.5 py-0.2 rounded-[4px] text-[#5F6B76]">
+                  TASK F
+                </span>
               </div>
-              <h3 className="font-semibold text-white group-hover:text-blue-400 transition">Backpropagation & Gradient Verification</h3>
-              <p className="text-xs text-gray-400 mt-2 leading-relaxed">
-                Exact analytical chain-rule derivation compared with central finite difference (ε=1e-6, error ≤ 1e-5). 100-step training loss curve.
+              <h3 className="font-semibold text-xs text-[#1B1F23]">Backpropagation & Gradient Verification</h3>
+              <p className="text-[11px] text-[#5F6B76] mt-1.5 leading-relaxed">
+                Exact analytical chain-rule derivation compared with C++ central finite difference (ε=1e-6, error &le; 1e-5). 100-step training loss curve.
               </p>
             </div>
-            <div className="mt-4 pt-3 border-t border-[#1F2937] flex items-center justify-between text-xs text-blue-400 font-medium">
+            <div className="mt-3 pt-2.5 border-t border-[#D5D9DE] flex items-center justify-between text-[11px] text-[#1B1F23] font-medium">
               <span>Verify Math</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition" />
+              <ArrowRight className="w-3.5 h-3.5 text-[#5F6B76]" />
             </div>
           </div>
 
           {/* Card 6: Reports & Verification */}
           <div 
             onClick={() => setActiveTab('reports')}
-            className="group cursor-pointer bg-[#111827] border border-[#1F2937] rounded-xl p-5 hover:border-blue-500/50 hover:bg-[#131d33] transition-all flex flex-col justify-between"
+            className="cursor-pointer bg-[#FFFFFF] border border-[#D5D9DE] rounded-[4px] p-4 hover:border-[#5F6B76] flex flex-col justify-between"
           >
             <div>
-              <div className="w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center mb-4">
-                <ShieldCheck className="w-5 h-5" />
+              <div className="flex items-center justify-between mb-2">
+                <div className="w-7 h-7 rounded-[4px] border border-[#D5D9DE] bg-[#F4F5F7] text-[#1B1F23] flex items-center justify-center">
+                  <ShieldCheck className="w-4 h-4 text-[#2E7D32]" />
+                </div>
+                <span className="text-[10px] font-mono border border-[#2E7D32] text-[#2E7D32] px-1.5 py-0.2 rounded-[4px]">
+                  100 PTS
+                </span>
               </div>
-              <h3 className="font-semibold text-white group-hover:text-blue-400 transition">Verification & Reports</h3>
-              <p className="text-xs text-gray-400 mt-2 leading-relaxed">
-                Comprehensive technical report, verification evidence against the 100-point rubric, downloadable CSV data, and AI assistance disclosure logs.
+              <h3 className="font-semibold text-xs text-[#1B1F23]">Verification & Technical Report</h3>
+              <p className="text-[11px] text-[#5F6B76] mt-1.5 leading-relaxed">
+                Formal technical report, 100-point rubric breakdown, downloadable CSV results data, and AI assistance disclosure logs.
               </p>
             </div>
-            <div className="mt-4 pt-3 border-t border-[#1F2937] flex items-center justify-between text-xs text-blue-400 font-medium">
+            <div className="mt-3 pt-2.5 border-t border-[#D5D9DE] flex items-center justify-between text-[11px] text-[#1B1F23] font-medium">
               <span>View Report</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition" />
+              <ArrowRight className="w-3.5 h-3.5 text-[#5F6B76]" />
             </div>
           </div>
         </div>

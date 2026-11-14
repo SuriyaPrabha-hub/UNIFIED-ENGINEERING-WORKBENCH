@@ -3,15 +3,12 @@ import * as THREE from 'three';
 import { 
   Box, 
   Upload, 
-  RotateCw, 
-  ZoomIn, 
   Maximize2, 
   Layers, 
   Info, 
   AlertTriangle, 
-  FileCode, 
-  Sparkles,
-  Thermometer
+  Thermometer,
+  FileText
 } from 'lucide-react';
 import { api } from '../api/client';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -33,8 +30,6 @@ export default function GeometryView() {
   const cameraRef = useRef(null);
   const rendererRef = useRef(null);
   const modelGroupRef = useRef(null);
-  const raycasterRef = useRef(new THREE.Raycaster());
-  const mouseRef = useRef(new THREE.Vector2());
 
   // Interaction tracking (Orbit Controls fallback)
   const isDraggingRef = useRef(false);
@@ -49,9 +44,9 @@ export default function GeometryView() {
     const width = mount.clientWidth || 800;
     const height = mount.clientHeight || 500;
 
-    // Scene
+    // Scene with engineering CAD dark background
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0e1524);
+    scene.background = new THREE.Color(0x1F2429);
     sceneRef.current = scene;
 
     // Camera
@@ -63,24 +58,23 @@ export default function GeometryView() {
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.shadowMap.enabled = true;
     rendererRef.current = renderer;
     mount.appendChild(renderer.domElement);
 
     // Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
     scene.add(ambientLight);
 
-    const dirLight1 = new THREE.DirectionalLight(0xffffff, 1.2);
+    const dirLight1 = new THREE.DirectionalLight(0xffffff, 1.0);
     dirLight1.position.set(5, 10, 7);
     scene.add(dirLight1);
 
-    const dirLight2 = new THREE.DirectionalLight(0x3b82f6, 0.6);
+    const dirLight2 = new THREE.DirectionalLight(0xd5d9de, 0.5);
     dirLight2.position.set(-5, -5, -5);
     scene.add(dirLight2);
 
-    // Grid helper
-    const gridHelper = new THREE.GridHelper(2, 20, 0x374151, 0x1f2937);
+    // Engineering grid helper
+    const gridHelper = new THREE.GridHelper(2, 20, 0x5F6B76, 0x2C333A);
     gridHelper.position.y = -0.05;
     scene.add(gridHelper);
 
@@ -109,34 +103,14 @@ export default function GeometryView() {
       const deltaY = e.clientY - previousMousePositionRef.current.y;
 
       if (isDraggingRef.current && modelGroupRef.current) {
-        // Orbit rotation
         modelGroupRef.current.rotation.y += deltaX * 0.008;
         modelGroupRef.current.rotation.x += deltaY * 0.008;
       } else if (isRightDraggingRef.current && cameraRef.current) {
-        // Pan
         cameraRef.current.position.x -= deltaX * 0.002;
         cameraRef.current.position.y += deltaY * 0.002;
       }
 
       previousMousePositionRef.current = { x: e.clientX, y: e.clientY };
-
-      // Node Raycasting for ANSYS mode
-      if (activeMode === 'ansys' && mountRef.current) {
-        const rect = mountRef.current.getBoundingClientRect();
-        mouseRef.current.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-        mouseRef.current.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-
-        raycasterRef.current.setFromCamera(mouseRef.current, cameraRef.current);
-        raycasterRef.current.params.Points.threshold = 0.015;
-
-        const intersects = raycasterRef.current.intersectObjects(modelGroupRef.current.children, true);
-        if (intersects.length > 0 && intersects[0].index !== undefined && ansysData?.nodes) {
-          const idx = intersects[0].index;
-          if (idx < ansysData.nodes.length) {
-            setSelectedNode(ansysData.nodes[idx]);
-          }
-        }
-      }
     };
 
     const handleMouseUp = () => {
@@ -147,30 +121,28 @@ export default function GeometryView() {
     const handleWheel = (e) => {
       e.preventDefault();
       if (!cameraRef.current) return;
-      const zoomFactor = e.deltaY * 0.001;
-      cameraRef.current.position.z += zoomFactor * 0.5;
-      cameraRef.current.position.z = Math.max(0.1, Math.min(10, cameraRef.current.position.z));
+      const zoomFactor = e.deltaY > 0 ? 1.1 : 0.9;
+      cameraRef.current.position.multiplyScalar(zoomFactor);
     };
 
     const dom = renderer.domElement;
     dom.addEventListener('mousedown', handleMouseDown);
+    dom.addEventListener('contextmenu', (e) => e.preventDefault());
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
     dom.addEventListener('wheel', handleWheel, { passive: false });
-    dom.addEventListener('contextmenu', (e) => e.preventDefault());
 
-    // Resize Handler
     const handleResize = () => {
-      if (!mountRef.current || !rendererRef.current || !cameraRef.current) return;
-      const w = mountRef.current.clientWidth;
-      const h = mountRef.current.clientHeight;
+      if (!mount || !rendererRef.current || !cameraRef.current) return;
+      const w = mount.clientWidth;
+      const h = mount.clientHeight;
       cameraRef.current.aspect = w / h;
       cameraRef.current.updateProjectionMatrix();
       rendererRef.current.setSize(w, h);
     };
     window.addEventListener('resize', handleResize);
 
-    // Initial Load: Load sample STL
+    // Auto-load built-in sample STL on initial mount
     loadSampleSTL();
 
     return () => {
@@ -187,7 +159,6 @@ export default function GeometryView() {
     };
   }, []);
 
-  // Fit Camera to Model Bounding Box
   const fitCameraToModel = () => {
     if (!cameraRef.current || !modelGroupRef.current) return;
     const box = new THREE.Box3().setFromObject(modelGroupRef.current);
@@ -207,10 +178,8 @@ export default function GeometryView() {
     }
   };
 
-  // Render STL Mesh in Three.js
   const renderSTL = (data) => {
     if (!modelGroupRef.current) return;
-    // Clear previous models
     while (modelGroupRef.current.children.length > 0) {
       const obj = modelGroupRef.current.children[0];
       modelGroupRef.current.remove(obj);
@@ -224,10 +193,11 @@ export default function GeometryView() {
       geometry.computeVertexNormals();
     }
 
+    // Engineering solid grey CAD material
     const material = new THREE.MeshStandardMaterial({
-      color: 0x3b82f6,
-      metalness: 0.2,
-      roughness: 0.4,
+      color: 0x8C96A0,
+      metalness: 0.1,
+      roughness: 0.6,
       wireframe: wireframe,
       side: THREE.DoubleSide
     });
@@ -237,7 +207,6 @@ export default function GeometryView() {
     fitCameraToModel();
   };
 
-  // Render ANSYS Point Cloud in Three.js
   const renderANSYS = (data) => {
     if (!modelGroupRef.current) return;
     while (modelGroupRef.current.children.length > 0) {
@@ -256,18 +225,16 @@ export default function GeometryView() {
     const maxT = data.max_temp_C;
     const rangeT = maxT - minT || 1.0;
 
-    // Jet / Thermal Colormap Helper
+    // Classic ANSYS Blue -> Cyan -> Green -> Yellow -> Red colormap
     for (let i = 0; i < count; ++i) {
       const n = nodes[i];
       positions[i * 3 + 0] = n.x;
       positions[i * 3 + 1] = n.y;
       positions[i * 3 + 2] = n.z;
 
-      // Normalized temperature: 0 (cold) to 1 (hot)
-      const val = (n.temp - minT) / rangeT;
-      // Colormap: Blue -> Cyan -> Green -> Yellow -> Red
+      const val = Math.max(0, Math.min(1, (n.temp - minT) / rangeT));
       const color = new THREE.Color();
-      color.setHSL((1.0 - val) * 0.7, 1.0, 0.5);
+      color.setHSL((1.0 - val) * 0.666, 1.0, 0.5);
 
       colors[i * 3 + 0] = color.r;
       colors[i * 3 + 1] = color.g;
@@ -279,7 +246,7 @@ export default function GeometryView() {
     geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
     const material = new THREE.PointsMaterial({
-      size: 0.018,
+      size: 0.02,
       vertexColors: true,
       sizeAttenuation: true
     });
@@ -289,7 +256,6 @@ export default function GeometryView() {
     fitCameraToModel();
   };
 
-  // Wireframe toggle update
   useEffect(() => {
     if (activeMode === 'stl' && modelGroupRef.current) {
       modelGroupRef.current.traverse((child) => {
@@ -300,7 +266,6 @@ export default function GeometryView() {
     }
   }, [wireframe, activeMode]);
 
-  // Load Built-in Samples
   const loadSampleSTL = async () => {
     setLoading(true);
     setError(null);
@@ -331,7 +296,6 @@ export default function GeometryView() {
     }
   };
 
-  // File Upload Handlers (Processed in C++ Backend)
   const handleSTLFileUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -379,30 +343,30 @@ export default function GeometryView() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* View Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-bold text-white tracking-tight flex items-center">
-            <Box className="w-6 h-6 text-blue-400 mr-2.5" /> 3D CAD & ANSYS Data Visualizer
+          <h2 className="text-base font-bold text-[#1B1F23] tracking-tight flex items-center">
+            <Box className="w-4 h-4 text-[#5F6B76] mr-2" /> 3D CAD &amp; ANSYS Data Visualization
           </h2>
-          <p className="text-sm text-gray-400">
-            C++ validated streaming parser for ASCII STL surface geometry and ANSYS CSV nodal temperature results.
+          <p className="text-xs text-[#5F6B76]">
+            C++ streaming parser for ASCII STL surface mesh and ANSYS CSV nodal temperature results.
           </p>
         </div>
 
         {/* Mode Switcher */}
-        <div className="flex items-center space-x-2 bg-[#111827] p-1.5 rounded-lg border border-[#1F2937]">
+        <div className="flex items-center space-x-1 bg-[#FFFFFF] p-1 rounded-[4px] border border-[#D5D9DE]">
           <button
             onClick={() => {
               setActiveMode('stl');
               if (stlData) renderSTL(stlData);
               else loadSampleSTL();
             }}
-            className={`px-3.5 py-1.5 rounded-md text-xs font-semibold transition ${
+            className={`px-3 py-1 rounded-[4px] text-xs font-semibold ${
               activeMode === 'stl' 
-                ? 'bg-blue-600 text-white shadow-sm' 
-                : 'text-gray-400 hover:text-white'
+                ? 'bg-[#E8590C] text-white' 
+                : 'text-[#5F6B76] hover:text-[#1B1F23]'
             }`}
           >
             ASCII STL Mesh
@@ -413,10 +377,10 @@ export default function GeometryView() {
               if (ansysData) renderANSYS(ansysData);
               else loadSampleANSYS();
             }}
-            className={`px-3.5 py-1.5 rounded-md text-xs font-semibold transition ${
+            className={`px-3 py-1 rounded-[4px] text-xs font-semibold ${
               activeMode === 'ansys' 
-                ? 'bg-blue-600 text-white shadow-sm' 
-                : 'text-gray-400 hover:text-white'
+                ? 'bg-[#E8590C] text-white' 
+                : 'text-[#5F6B76] hover:text-[#1B1F23]'
             }`}
           >
             ANSYS Point Cloud (CSV)
@@ -426,187 +390,200 @@ export default function GeometryView() {
 
       {/* Error Alert */}
       {error && (
-        <div className="bg-rose-500/10 border border-rose-500/30 rounded-xl p-4 flex items-start space-x-3 text-rose-300 text-sm">
-          <AlertTriangle className="w-5 h-5 flex-shrink-0 text-rose-400 mt-0.5" />
+        <div className="bg-[#FFF5F5] border border-[#C62828] rounded-[4px] p-3 flex items-start space-x-2 text-[#C62828] text-xs font-mono">
+          <AlertTriangle className="w-4 h-4 flex-shrink-0 text-[#C62828] mt-0.5" />
           <div className="flex-1">
-            <div className="font-semibold">Validation Failure</div>
-            <div className="font-mono text-xs mt-1 text-rose-200">{error}</div>
+            <div className="font-bold">Validation Error</div>
+            <div className="mt-0.5">{error}</div>
           </div>
         </div>
       )}
 
-      {/* Main 3D Canvas Card */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div className="lg:col-span-3 bg-[#111827] border border-[#1F2937] rounded-xl overflow-hidden shadow-lg flex flex-col">
+      {/* Main 3D Canvas Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+        <div className="lg:col-span-3 bg-[#FFFFFF] border border-[#D5D9DE] rounded-[4px] overflow-hidden flex flex-col">
           {/* Canvas Toolbar */}
-          <div className="bg-[#161F30] px-4 py-2.5 border-b border-[#1F2937] flex items-center justify-between text-xs text-gray-300">
-            <div className="flex items-center space-x-4">
-              <span className="font-mono font-medium text-white flex items-center">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 mr-2"></span>
+          <div className="bg-[#F4F5F7] px-3 py-2 border-b border-[#D5D9DE] flex items-center justify-between text-xs text-[#5F6B76]">
+            <div className="flex items-center space-x-3">
+              <span className="font-mono font-medium text-[#1B1F23] flex items-center text-xs">
+                <span className="w-2 h-2 rounded-[1px] bg-[#2E7D32] mr-1.5"></span>
                 {activeMode === 'stl' ? (stlData?.solid_name || 'STL Mesh') : 'ANSYS Nodal Cloud'}
               </span>
-              <span className="text-gray-500">|</span>
-              <span className="text-gray-400">Rotate: Left-drag • Pan: Right-drag • Zoom: Scroll</span>
+              <span className="text-[#D5D9DE]">|</span>
+              <span className="text-[11px] text-[#5F6B76] font-mono">Rotate: Left-drag • Pan: Right-drag • Zoom: Scroll</span>
             </div>
 
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-1.5">
               {activeMode === 'stl' && (
                 <button
                   onClick={() => setWireframe(!wireframe)}
-                  className={`px-2.5 py-1 rounded border text-xs font-medium flex items-center transition ${
+                  className={`px-2 py-0.5 rounded-[4px] border text-xs font-mono flex items-center ${
                     wireframe 
-                      ? 'bg-blue-600/20 border-blue-500/40 text-blue-300' 
-                      : 'border-[#374151] hover:bg-[#1F2937] text-gray-300'
+                      ? 'bg-[#1F2429] text-white border-[#1F2429]' 
+                      : 'border-[#D5D9DE] bg-[#FFFFFF] hover:bg-[#F4F5F7] text-[#1B1F23]'
                   }`}
                 >
-                  <Layers className="w-3.5 h-3.5 mr-1" /> Wireframe
+                  <Layers className="w-3 h-3 mr-1" /> Wireframe
                 </button>
               )}
               <button
                 onClick={fitCameraToModel}
-                className="px-2.5 py-1 rounded border border-[#374151] hover:bg-[#1F2937] text-gray-300 text-xs font-medium flex items-center transition"
+                className="px-2 py-0.5 rounded-[4px] border border-[#D5D9DE] bg-[#FFFFFF] hover:bg-[#F4F5F7] text-[#1B1F23] text-xs font-mono flex items-center"
               >
-                <Maximize2 className="w-3.5 h-3.5 mr-1" /> Fit View
+                <Maximize2 className="w-3 h-3 mr-1" /> Fit View
               </button>
             </div>
           </div>
 
           {/* Three.js Viewport */}
-          <div className="relative flex-1 min-h-[480px]" ref={mountRef}>
+          <div className="relative flex-1 min-h-[460px]" ref={mountRef}>
             {loading && (
-              <div className="absolute inset-0 bg-[#0B0F19]/80 backdrop-blur-sm flex items-center justify-center z-20">
-                <LoadingSpinner text="Parsing in C++ Core & Generating 3D Buffers..." />
+              <div className="absolute inset-0 bg-[#F4F5F7]/80 flex items-center justify-center z-20">
+                <LoadingSpinner text="Parsing in C++ Core & Generating Buffers..." />
               </div>
             )}
 
-            {/* ANSYS Temperature Legend Overlay */}
+            {/* ANSYS Classic Temperature Legend Overlay */}
             {activeMode === 'ansys' && ansysData && (
-              <div className="absolute top-4 right-4 bg-[#111827]/90 backdrop-blur border border-[#1F2937] rounded-lg p-3 text-xs shadow-xl z-10 w-44">
-                <div className="font-semibold text-gray-200 mb-2 flex items-center">
-                  <Thermometer className="w-3.5 h-3.5 text-orange-400 mr-1.5" /> Nodal Temperature (°C)
+              <div className="absolute top-3 right-3 bg-[#FFFFFF] border border-[#D5D9DE] rounded-[4px] p-2.5 text-xs z-10 w-48 text-[#1B1F23]">
+                <div className="font-bold text-[11px] uppercase tracking-wider text-[#1B1F23] mb-1.5 flex items-center justify-between">
+                  <span className="flex items-center">
+                    <Thermometer className="w-3.5 h-3.5 text-[#5F6B76] mr-1" /> Temperature
+                  </span>
+                  <span className="text-[10px] font-mono border border-[#B7791F] text-[#B7791F] px-1 py-0.2 rounded-[2px]">
+                    SYNTHETIC
+                  </span>
                 </div>
-                <div className="h-4 rounded bg-gradient-to-r from-blue-500 via-green-400 via-yellow-400 to-red-500 border border-white/10 mb-1.5"></div>
-                <div className="flex justify-between font-mono text-[11px] text-gray-300">
-                  <span>{ansysData.min_temp_C.toFixed(1)}°C</span>
-                  <span>{((ansysData.min_temp_C + ansysData.max_temp_C) / 2).toFixed(1)}°C</span>
-                  <span>{ansysData.max_temp_C.toFixed(1)}°C</span>
+                {/* Classic ANSYS Blue -> Cyan -> Green -> Yellow -> Red Spectrum */}
+                <div 
+                  className="h-3.5 rounded-[2px] border border-[#D5D9DE] mb-1" 
+                  style={{
+                    background: 'linear-gradient(to right, #0000FF, #00FFFF, #00FF00, #FFFF00, #FF0000)'
+                  }}
+                ></div>
+                <div className="flex justify-between font-mono text-[10px] text-[#1B1F23]">
+                  <span>{ansysData.min_temp_C.toFixed(1)} degC</span>
+                  <span>{((ansysData.min_temp_C + ansysData.max_temp_C) / 2).toFixed(1)} degC</span>
+                  <span>{ansysData.max_temp_C.toFixed(1)} degC</span>
                 </div>
-                <div className="text-[10px] text-gray-500 mt-2 text-center">
-                  Hover/Click node for 3D inspection
+                <div className="text-[10px] text-[#5F6B76] mt-1 text-center font-mono">
+                  Scale: Blue (cold) to Red (hot)
                 </div>
               </div>
             )}
 
             {/* Selected Node Tooltip */}
             {activeMode === 'ansys' && selectedNode && (
-              <div className="absolute bottom-4 left-4 bg-[#111827]/95 backdrop-blur border border-blue-500/40 rounded-lg p-3 text-xs shadow-xl z-10 font-mono">
-                <div className="font-bold text-blue-400 mb-1">Node #{selectedNode.id}</div>
-                <div className="text-gray-300">X: {selectedNode.x.toFixed(4)} m</div>
-                <div className="text-gray-300">Y: {selectedNode.y.toFixed(4)} m</div>
-                <div className="text-gray-300">Z: {selectedNode.z.toFixed(4)} m</div>
-                <div className="text-emerald-400 font-bold mt-1">Temperature: {selectedNode.temp.toFixed(2)} °C</div>
+              <div className="absolute bottom-3 left-3 bg-[#FFFFFF] border border-[#D5D9DE] rounded-[4px] p-2.5 text-xs z-10 font-mono text-[#1B1F23]">
+                <div className="font-bold text-xs mb-1">Node #{selectedNode.id}</div>
+                <div>X: {selectedNode.x.toFixed(4)} m</div>
+                <div>Y: {selectedNode.y.toFixed(4)} m</div>
+                <div>Z: {selectedNode.z.toFixed(4)} m</div>
+                <div className="font-bold text-[#E8590C] mt-1">Temperature: {selectedNode.temp.toFixed(2)} degC</div>
               </div>
             )}
           </div>
         </div>
 
         {/* Sidebar Controls & Metadata */}
-        <div className="space-y-5">
+        <div className="space-y-4">
           {/* File Upload Actions Card */}
-          <div className="bg-[#111827] border border-[#1F2937] rounded-xl p-5 shadow-sm">
-            <h3 className="text-sm font-bold text-white mb-3 flex items-center">
-              <Upload className="w-4 h-4 text-blue-400 mr-2" /> Data Import
+          <div className="bg-[#FFFFFF] border border-[#D5D9DE] rounded-[4px] p-4">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[#1B1F23] mb-3 flex items-center font-mono">
+              <Upload className="w-3.5 h-3.5 text-[#5F6B76] mr-1.5" /> Data Import
             </h3>
 
             {activeMode === 'stl' ? (
-              <div className="space-y-3">
-                <label className="flex flex-col items-center justify-center border-2 border-dashed border-[#374151] hover:border-blue-500/60 rounded-lg p-4 cursor-pointer transition bg-[#161F30]/40">
-                  <Upload className="w-6 h-6 text-gray-400 mb-2" />
-                  <span className="text-xs font-medium text-gray-200">Upload ASCII STL (.stl)</span>
-                  <span className="text-[10px] text-gray-500 mt-0.5">Parsed via C++ streaming parser</span>
+              <div className="space-y-2.5">
+                <label className="flex flex-col items-center justify-center border border-dashed border-[#D5D9DE] hover:border-[#5F6B76] rounded-[4px] p-3 cursor-pointer bg-[#F4F5F7]">
+                  <Upload className="w-5 h-5 text-[#5F6B76] mb-1.5" />
+                  <span className="text-xs font-semibold text-[#1B1F23]">Upload ASCII STL (.stl)</span>
+                  <span className="text-[10px] text-[#5F6B76] font-mono mt-0.5">Streamed through C++ parser</span>
                   <input type="file" accept=".stl" onChange={handleSTLFileUpload} className="hidden" />
                 </label>
 
                 <button
                   onClick={loadSampleSTL}
-                  className="w-full flex items-center justify-center px-3 py-2 rounded-lg bg-[#1F2937] hover:bg-[#374151] text-xs font-medium text-gray-200 border border-[#374151] transition"
+                  className="w-full flex items-center justify-center px-3 py-1.5 rounded-[4px] bg-[#FFFFFF] hover:bg-[#F4F5F7] text-xs font-semibold text-[#1B1F23] border border-[#D5D9DE]"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-blue-400 mr-2" /> Load Built-in Sample Rod STL
+                  <FileText className="w-3.5 h-3.5 text-[#5F6B76] mr-1.5" /> Load Sample Rod STL
                 </button>
               </div>
             ) : (
-              <div className="space-y-3">
-                <label className="flex flex-col items-center justify-center border-2 border-dashed border-[#374151] hover:border-blue-500/60 rounded-lg p-4 cursor-pointer transition bg-[#161F30]/40">
-                  <Upload className="w-6 h-6 text-gray-400 mb-2" />
-                  <span className="text-xs font-medium text-gray-200">Upload ANSYS CSV (.csv)</span>
-                  <span className="text-[10px] text-gray-500 mt-0.5">Columns: node_id,x_m,y_m,z_m,temperature_C</span>
+              <div className="space-y-2.5">
+                <label className="flex flex-col items-center justify-center border border-dashed border-[#D5D9DE] hover:border-[#5F6B76] rounded-[4px] p-3 cursor-pointer bg-[#F4F5F7]">
+                  <Upload className="w-5 h-5 text-[#5F6B76] mb-1.5" />
+                  <span className="text-xs font-semibold text-[#1B1F23]">Upload ANSYS CSV (.csv)</span>
+                  <span className="text-[10px] text-[#5F6B76] font-mono mt-0.5">node_id,x_m,y_m,z_m,temperature_C</span>
                   <input type="file" accept=".csv" onChange={handleCSVFileUpload} className="hidden" />
                 </label>
 
                 <button
                   onClick={loadSampleANSYS}
-                  className="w-full flex items-center justify-center px-3 py-2 rounded-lg bg-[#1F2937] hover:bg-[#374151] text-xs font-medium text-gray-200 border border-[#374151] transition"
+                  className="w-full flex items-center justify-center px-3 py-1.5 rounded-[4px] bg-[#FFFFFF] hover:bg-[#F4F5F7] text-xs font-semibold text-[#1B1F23] border border-[#D5D9DE]"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-orange-400 mr-2" /> Load Synthetic ANSYS Data
+                  <FileText className="w-3.5 h-3.5 text-[#5F6B76] mr-1.5" /> Load Synthetic ANSYS Dataset
                 </button>
               </div>
             )}
           </div>
 
           {/* Model Inspection & Metadata Card */}
-          <div className="bg-[#111827] border border-[#1F2937] rounded-xl p-5 shadow-sm text-xs space-y-3">
-            <h3 className="text-sm font-bold text-white flex items-center">
-              <Info className="w-4 h-4 text-blue-400 mr-2" /> Inspection Metrics
+          <div className="bg-[#FFFFFF] border border-[#D5D9DE] rounded-[4px] p-4 text-xs space-y-2.5">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[#1B1F23] flex items-center font-mono">
+              <Info className="w-3.5 h-3.5 text-[#5F6B76] mr-1.5" /> Inspection Metrics
             </h3>
 
             {activeMode === 'stl' && stlData ? (
-              <div className="space-y-2 font-mono">
-                <div className="flex justify-between py-1 border-b border-[#1F2937]">
-                  <span className="text-gray-400">Solid Name</span>
-                  <span className="text-gray-200 font-bold">{stlData.solid_name}</span>
+              <div className="space-y-1.5 font-mono text-xs">
+                <div className="flex justify-between py-1 border-b border-[#D5D9DE]">
+                  <span className="text-[#5F6B76]">Solid Name</span>
+                  <span className="text-[#1B1F23] font-bold">{stlData.solid_name}</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-[#1F2937]">
-                  <span className="text-gray-400">Triangles</span>
-                  <span className="text-blue-400 font-bold">{stlData.triangle_count}</span>
+                <div className="flex justify-between py-1 border-b border-[#D5D9DE]">
+                  <span className="text-[#5F6B76]">Triangles</span>
+                  <span className="text-[#1B1F23] font-bold">{stlData.triangle_count}</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-[#1F2937]">
-                  <span className="text-gray-400">Diagonal Size</span>
-                  <span className="text-gray-200">{stlData.bbox?.diag_size?.toFixed(3)} m</span>
+                <div className="flex justify-between py-1 border-b border-[#D5D9DE]">
+                  <span className="text-[#5F6B76]">Bounding Diag</span>
+                  <span className="text-[#1B1F23]">{stlData.bbox?.diag_size?.toFixed(3)} m</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-[#1F2937]">
-                  <span className="text-gray-400">Validation</span>
-                  <span className="text-emerald-400 font-bold">{stlData.validation_status}</span>
+                <div className="flex justify-between py-1 border-b border-[#D5D9DE]">
+                  <span className="text-[#5F6B76]">Validation</span>
+                  <span className="text-[#2E7D32] font-bold">{stlData.validation_status}</span>
                 </div>
               </div>
             ) : activeMode === 'ansys' && ansysData ? (
-              <div className="space-y-2 font-mono">
-                <div className="flex justify-between py-1 border-b border-[#1F2937]">
-                  <span className="text-gray-400">Nodal Count</span>
-                  <span className="text-blue-400 font-bold">{ansysData.node_count} nodes</span>
+              <div className="space-y-1.5 font-mono text-xs">
+                <div className="flex justify-between py-1 border-b border-[#D5D9DE]">
+                  <span className="text-[#5F6B76]">Nodal Count</span>
+                  <span className="text-[#1B1F23] font-bold">{ansysData.node_count} nodes</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-[#1F2937]">
-                  <span className="text-gray-400">Min Temp</span>
-                  <span className="text-cyan-400 font-bold">{ansysData.min_temp_C?.toFixed(2)} °C</span>
+                <div className="flex justify-between py-1 border-b border-[#D5D9DE]">
+                  <span className="text-[#5F6B76]">Min Temp</span>
+                  <span className="text-[#1B1F23] font-bold">{ansysData.min_temp_C?.toFixed(2)} degC</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-[#1F2937]">
-                  <span className="text-gray-400">Max Temp</span>
-                  <span className="text-rose-400 font-bold">{ansysData.max_temp_C?.toFixed(2)} °C</span>
+                <div className="flex justify-between py-1 border-b border-[#D5D9DE]">
+                  <span className="text-[#5F6B76]">Max Temp</span>
+                  <span className="text-[#1B1F23] font-bold">{ansysData.max_temp_C?.toFixed(2)} degC</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-[#1F2937]">
-                  <span className="text-gray-400">Avg Temp</span>
-                  <span className="text-amber-400 font-bold">{ansysData.avg_temp_C?.toFixed(2)} °C</span>
+                <div className="flex justify-between py-1 border-b border-[#D5D9DE]">
+                  <span className="text-[#5F6B76]">Avg Temp</span>
+                  <span className="text-[#1B1F23] font-bold">{ansysData.avg_temp_C?.toFixed(2)} degC</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-[#1F2937]">
-                  <span className="text-gray-400">Validation</span>
-                  <span className="text-emerald-400 font-bold">{ansysData.validation_status}</span>
+                <div className="flex justify-between py-1 border-b border-[#D5D9DE]">
+                  <span className="text-[#5F6B76]">Provenance</span>
+                  <span className="border border-[#B7791F] text-[#B7791F] px-1 py-0.2 rounded-[2px] text-[10px] font-bold">
+                    SYNTHETIC
+                  </span>
                 </div>
               </div>
             ) : (
-              <p className="text-gray-500">No model loaded yet.</p>
+              <p className="text-[#5F6B76] text-xs font-mono">No model loaded yet.</p>
             )}
 
-            <div className="pt-2 text-[11px] text-gray-500 leading-relaxed font-sans">
-              Tested parser throughput: up to 250,000 STL facets (~25 MB) and 500,000 ANSYS CSV lines in C++17 without UI freezing.
+            <div className="pt-2 text-[10px] text-[#5F6B76] leading-relaxed border-t border-[#D5D9DE] font-mono">
+              Parser verified in C++17: supports &gt; 250,000 STL facets (~25 MB) and 500,000 ANSYS CSV lines without UI freezing.
             </div>
           </div>
         </div>
