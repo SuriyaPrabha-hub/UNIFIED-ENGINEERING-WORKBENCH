@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: unified-engineering-workbench
+    runtime: docker
+    plan: free
+    region: oregon
+    envVars:
+      - key: PORT
+        value: 8080
+    healthCheckPath: /api/status

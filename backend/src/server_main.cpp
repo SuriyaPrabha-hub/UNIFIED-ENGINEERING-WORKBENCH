@@ -24,7 +24,14 @@ static void setCorsHeaders(httplib::Response& res) {
 
 int main(int argc, char* argv[]) {
     int port = 8080;
-    if (argc > 1) {
+    const char* env_port = std::getenv("PORT");
+    if (env_port) {
+        try {
+            port = std::stoi(env_port);
+        } catch (...) {
+            port = 8080;
+        }
+    } else if (argc > 1) {
         try {
             port = std::stoi(argv[1]);
         } catch (...) {
@@ -349,12 +356,12 @@ int main(int argc, char* argv[]) {
 
     std::cout << "========================================================\n";
     std::cout << "  UNIFIED ENGINEERING WORKBENCH C++ BACKEND SERVER      \n";
-    std::cout << "  Listening on: http://127.0.0.1:" << port << "\n";
+    std::cout << "  Listening on: http://0.0.0.0:" << port << " (http://localhost:" << port << ")\n";
     std::cout << "  C++17 Numerical Core | Active Hardware Concurrency: " 
               << std::thread::hardware_concurrency() << "\n";
     std::cout << "========================================================\n" << std::flush;
 
-    bool ok = svr.listen("127.0.0.1", port);
+    bool ok = svr.listen("0.0.0.0", port);
     if (!ok) {
         std::cerr << "SERVER FAILED TO BIND TO PORT " << port << std::endl << std::flush;
         return 1;

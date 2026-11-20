@@ -27,10 +27,14 @@ set(CORE_SOURCES
 )
 
 # REST API Server Executable
+find_package(Threads REQUIRED)
+
 add_executable(workbench_server
     ${CORE_SOURCES}
     backend/src/server_main.cpp
 )
+
+target_link_libraries(workbench_server PRIVATE Threads::Threads)
 
 if(WIN32)
     target_link_libraries(workbench_server PRIVATE ws2_32)
